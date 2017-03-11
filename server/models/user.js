@@ -14,4 +14,4 @@ var userSchema = new mongoSchema({
   "lastLoginOn": Date
 });
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model('user', userSchema, 'user');

@@ -12,4 +12,4 @@ var shoeSchema = new mongoSchema({
     "description": String
 });
 
-module.exports = mongoose.model('shoe', shoeSchema);
+module.exports = mongoose.model('shoe', shoeSchema, 'shoe');
