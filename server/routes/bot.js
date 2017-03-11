@@ -24,20 +24,41 @@ const INTENTS = {
 };
 
 var bot = new builder.UniversalBot(connector, function (session) {
-    recastClient.textRequest(session.message.text)
-        .then(res => {
-            const intent = res.intent();
-            console.log(intent);
-            const entity = res.get('trainers');
-            if(intent){
-                session.send(INTENTS[intent.slug](entity))
-            } else{
-                console.log("askfañsjfd");
-                session.send("hey");
+    if(session.message.attachment)
+
+    {
+        /*var python = require('child_process').spawn(
+            'python',
+            // second argument is array of parameters, e.g.:
+            ["/main.py"
+                , session.message.attachment.contentUrl
+            ]
+        )
+        var output = "";
+        python.stdout.on('data', function(data){ output += data });
+        python.on('close', function(code){
+            if (code !== 0) {
+                return res.send(500, code);
             }
-            //session.send(`Entity: ${entity.name}`);
-        })
-        .catch(() => session.send('I need some sleep right now... Talk to me later!'));
+            return res.send(200, output);*/
+    }
+
+    else{
+        recastClient.textRequest(session.message.text)
+            .then(res => {
+                const intent = res.intent();
+                console.log(intent);
+                const entity = res.get('trainers');
+                if(intent){
+                    session.send(INTENTS[intent.slug](entity))
+                } else{
+                    console.log("askfañsjfd");
+                    session.send("hey");
+                }
+                //session.send(`Entity: ${entity.name}`);
+            })
+            .catch(() => session.send('I need some sleep right now... Talk to me later!'));
+    }
 });
 
 module.exports = router;
