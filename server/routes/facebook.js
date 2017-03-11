@@ -14,12 +14,14 @@ var shoe = require('../models/shoe');
 
 
 const getGreetings = require('../intents/greetings');
+const getAskForModel= require('../intents/askformodel');
 //const getNotUnderstood = require('../intents/notUnderstood');
 
 const recastClient = new recast.Client(config.recast_dev);
 
 const INTENTS = {
-    greetings: getGreetings
+    greetings: getGreetings,
+    askformodel: getAskForModel
 };
 
 var randomBegin = ["It appears to be ", "Oh! These are ", "I'm so confident these are ", "Ok, I have found that these are ",
@@ -53,7 +55,10 @@ router.post('', function (req, res) {
             // Iterate over each messaging event
             entry.messaging.forEach(function(event) {
 
-                if (event.message) {
+                if(event.postback){
+                    console.log(event);
+                    managePostBack(event);
+                } else if (event.message) {
                     receivedMessage(event);
                 } else {
                     console.log("Webhook received unknown event: ", event);
@@ -106,24 +111,33 @@ function receivedMessage(event) {
                 recastClient.textRequest(messageText)
                     .then(res => {
                         const intent = res.intent();
-                        if(intent != null){
-                            switch (intent.slug){
+                        if (intent != null) {
+                            console.log("HOSTIA PUTA YA " + intent.slug)
+                            switch (intent.slug) {
                                 case 'greetings':
                                     console.log("Sí es un saludo");
                                     sendTextMessage(senderID, INTENTS[intent.slug]());
+                                    break;
+                                case 'askformodel':
+                                    console.log('Está pidiendo info de un modelo');
+                                    sendTextMessage(senderID, INTENTS[intent.slug]());
+                                    sendLoading(senderID);
+                                    sendCardMessage(senderID);
                                     break;
                                 default:
                                     console.log("No es un saludo");
                                     sendTextMessage(senderID, "gilipollas");
                                     break;
                             }
-                        } else{
+                        } else {
                             console.log("No es un saludo");
                             sendTextMessage(senderID, "gilipollas");
                         }
                     })
-                    .catch(() => sendTextMessage(senderID, 'I need some sleep right now... Talk to me later!'));
-
+                    .catch((err) => {
+                        console.log(err);
+                        sendTextMessage(senderID, 'I need some sleep right now... Talk to me later!');
+                    });
             }
         } else {
             console.error("Unable to find user");
@@ -215,7 +229,93 @@ function sendGenericMessage(recipientId, messageText) {
     // To be expanded in later sections
 }
 
+function managePostBack(event){
+    var senderID = event.sender.id;
+    var recipientID = event.recipient.id;
+    var timeOfPostback = event.timestamp;
+
+    // The 'payload' param is a developer-defined field which is set in a postback
+    // button for Structured Messages.
+    var payload = event.postback.payload;
+
+    console.log("Received postback for user %d and page %d with payload '%s' " +
+        "at %d", senderID, recipientID, payload, timeOfPostback);
+
+    // When a postback is called, we'll send a message back to the sender to
+    // let them know it was successful
+    sendTextMessage(senderID, JSON.parse(event.postback.payload).text);
+}
+
+function sendCardMessage(recipientId/*, trainer*/){
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "generic",
+                    elements: [{
+                        title: "ZAPATILLA X_PLR",
+                        item_url: "http://www.adidas.es/zapatilla-x_plr/BB1100.html?pr=home_rr&slot=2",
+                        image_url: "http://www.adidas.es/dis/dw/image/v2/aagl_prd/on/demandware.static/-/Sites-adidas-products/default/dw4863d725/zoom/BB1100_01_standard.jpg?sw=500&sfrm=jpg",
+                        buttons: [{
+                            type: "web_url",
+                            url: "http://www.adidas.es/zapatilla-x_plr/BB1100.html?pr=home_rr&slot=2",
+                            title: "Go to shop"
+                        }, {
+                            type: "postback",
+                            title: "Show more info",
+                            payload: '{ "name": "Zapatilla x_plr", "text": "jajajaja xddd"}'
+                        }],
+                    }]
+                }
+            }
+        }/*
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "generic",
+                    elements: [{
+                        title: trainer.name,
+                        item_url: trainer.itemUrl,
+                        image_url: trainer.imageUrl,
+                        buttons: [{
+                            type: "web_url",
+                            url: trainer.itemUrl,
+                            title: "Go to shop"
+                        }, {
+                            type: "postback",
+                            title: "Show more info",
+                            payload: "Show more info",
+                        }],
+                    }, {
+                        title: "touch",
+                        subtitle: "Your Hands, Now in VR",
+                        item_url: "https://www.oculus.com/en-us/touch/",
+                        image_url: "http://messengerdemo.parseapp.com/img/touch.png",
+                        buttons: [{
+                            type: "web_url",
+                            url: trainer.itemUrl,
+                            title: "Open Web URL"
+                        }, {
+                            type: "postback",
+                            title: "Call Postback",
+                            payload: "Payload for second bubble",
+                        }]
+                    }]
+                }
+            }
+        }*/
+    };
+
+    callSendAPI(messageData);
+}
+
 function sendTextMessage(recipientId, messageText) {
+    console.log(messageText);
     var messageData = {
         recipient: {
             id: recipientId
