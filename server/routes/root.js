@@ -11,7 +11,7 @@ var post = require('../models/post');
 /* GET api listing. */
 router.get('/', (req, res) => {
     var exec = require('child_process').exec;
-    var cmd = 'python ../Main.py http://i.imgur.com/JaDWD4t.jpg';
+    var cmd = 'python Main.py http://i.imgur.com/JaDWD4t.jpg';
 
     exec(cmd, function(error, stdout, stderr) {
         console.log(error);
