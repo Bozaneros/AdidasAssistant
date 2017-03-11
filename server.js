@@ -20,6 +20,8 @@ const root = require('./server/routes/root');
 const register = require('./server/routes/register');
 //const bot = require('./server/routes/bot');
 const facebook = require('./server/routes/facebook');
+const shoe = require('./server/routes/shoe');
+const capture = require('./server/routes/capture');
 
 const app = express();
 
@@ -33,9 +35,11 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 // Set our api routes
 app.use('/webhook', facebook);
-//app.use(api, bot);
+app.use(api, shoe);
+app.use(api, capture);
 app.use(api, register);
 app.use(api, root);
+//app.use(api, bot);
 
 // Catch all other routes and return the index file
 app.get('*', (req, res) => {
