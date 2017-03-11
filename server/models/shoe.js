@@ -8,7 +8,7 @@ var mongoSchema = mongoose.Schema;
 var shoeSchema = new mongoSchema({
     "code": String,
     "name": String,
-    "price": double,
+    "price": Number,
     "description": String
 });
 

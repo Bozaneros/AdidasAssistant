@@ -10,7 +10,7 @@ var captureSchema = new mongoSchema({
     "user": String,
     "name": String,
     "code": String,
-    "score": double
+    "score": Number
 });
 
 module.exports = mongoose.model('capture', captureSchema);

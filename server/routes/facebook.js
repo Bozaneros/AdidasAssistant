@@ -9,6 +9,10 @@ const recast = require('recastai');
 const request = require('request');
 const util = require('util');
 
+var capture = require('../models/capture');
+var shoe = require('../models/shoe');
+
+
 const getGreetings = require('../intents/greetings');
 //const getNotUnderstood = require('../intents/notUnderstood');
 
@@ -17,6 +21,11 @@ const recastClient = new recast.Client(config.recast_dev);
 const INTENTS = {
     greetings: getGreetings
 };
+
+var randomBegin = ["It appears to be ", "Oh! These are ", "I'm so confident these are ", "Ok, I have found that these are ",
+    "Wait a moment! These are the new "];
+
+var randomEnd = [""];
 
 router.get('', function(req, res) {
     if (req.query['hub.mode'] === 'subscribe' &&
@@ -30,6 +39,7 @@ router.get('', function(req, res) {
 });
 
 router.post('', function (req, res) {
+
     var data = req.body;
 
     // Make sure this is a page subscription
@@ -63,6 +73,18 @@ router.post('', function (req, res) {
 function receivedMessage(event) {
 
     var senderID = event.sender.id;
+
+    request({
+        uri: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: { access_token: config.page_token },
+        method: 'POST',
+        json: {"recipient": {"id": senderID},
+            "sender_action":"typing_on"}
+    }, function (error, response, body){
+        console.log("AAAAAAAAAAAAAAAAAH " + error);
+        console.log("BBBBBBBBBBBBBBBBEH " + response);
+        console.log("CEEEEEEEEEEEEEEEEH " + body);
+    });
 
     //TODO: Hacer algo con el nombre del usuario (y mas info)
     console.log("Llamando a fb");
@@ -121,7 +143,81 @@ function receivedMessage(event) {
 
 function processAttachment(senderID, messageAttachments){
     console.log(messageAttachments);
-    sendTextMessage(senderID, "Attachments eh");
+    // Iterate over each entry - there may be multiple if batched
+    messageAttachments.forEach(function(attachment) {
+
+        switch (attachment.type) {
+            case "image":
+                var exec = require('child_process').exec;
+
+                var cmd = 'python ../main.py ' + attachment.payload.url;
+                var newCapture = new capture();
+                exec(cmd, function (error, stdout, stderr) {
+                    console.log("Error" + error);
+                    console.log("Stdout: " + stdout);
+                    var firstLine = stdout.split('\n')[0];
+                    console.log("First Line: " + firstLine);
+                    var arr = firstLine.split(" ");
+                    console.log("Arr: " + arr);
+                    switch (arr[0]) {
+                        case "bb1302":
+                            newCapture.code = "bb1302";
+                            break;
+                        case "zxflux":
+                            newCapture.code = "zxflux";
+                            break;
+                        case "c77124":
+                            newCapture.code = "c77124";
+                            break;
+                        case "ba8278":
+                            newCapture.code = "ba8278";
+                            break;
+                        case "bb0008":
+                            newCapture.code = "bb0008";
+                            break;
+                        case "bb5477":
+                            newCapture.code = "bb5477";
+                            break;
+                        case "boost":
+                            newCapture.code = "boost";
+                            break;
+                        case "adidas":
+                            newCapture.code = "adidas";
+                            break;
+                        default:
+                            break;
+                    }
+                    newCapture.id = senderID;
+                    newCapture.name = "";
+                    newCapture.user = "";
+                    newCapture.score = parseFloat(arr[3].replace(')', ''));
+                    newUser.save(function (err, data) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        shoe.findOne({code: newCapture.code}, function (err, data) {
+                            if (err) {
+                                //Error servidor
+                                response = {"error": true, "message": "Fetching error"};
+                                res.status(500).json(response);
+                            } else {
+                                var randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
+                                response = randBegin + "\"" + data.name + "\"" + ". " + data.description
+                                    + ". You have them for " + data.price + "$ at adidas.com";
+                                sendTextMessage(senderID, response);
+                            }
+                        })
+                    });
+                    console.log(stdout);
+                    console.log(stderr);
+                });
+                break;
+            default:
+                sendTextMessage(senderID, "I don't know about this...");
+                break;
+        }
+    });
+
 }
 
 function sendGenericMessage(recipientId, messageText) {
