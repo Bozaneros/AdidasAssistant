@@ -157,28 +157,28 @@ function processAttachment(senderID, messageAttachments){
                     var firstLine = stdout.split('\n')[0];
                     var arr = firstLine.split(" ");
                     switch (arr[0]) {
-                        case bb1302:
+                        case "bb1302":
                             newCapture.code = "bb1302";
                             break;
-                        case zxflux:
+                        case "zxflux":
                             newCapture.code = "zxflux";
                             break;
-                        case c77124:
+                        case "c77124":
                             newCapture.code = "c77124";
                             break;
-                        case ba8278:
+                        case "ba8278":
                             newCapture.code = "ba8278";
                             break;
-                        case bb0008:
+                        case "bb0008":
                             newCapture.code = "bb0008";
                             break;
-                        case bb5477:
+                        case "bb5477":
                             newCapture.code = "bb5477";
                             break;
-                        case boost:
+                        case "boost":
                             newCapture.code = "boost";
                             break;
-                        case adidas:
+                        case "adidas":
                             newCapture.code = "adidas";
                             break;
                         default:
