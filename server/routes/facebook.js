@@ -153,11 +153,12 @@ function processAttachment(senderID, messageAttachments){
                 var cmd = 'python ../main.py ' + attachment.payload.url;
                 var newCapture = new capture();
                 exec(cmd, function (error, stdout, stderr) {
-                    console.log(error);
-                    console.log(stdout);
+                    console.log("Error" + error);
+                    console.log("Stdout: " + stdout);
                     var firstLine = stdout.split('\n')[0];
-                    console.log(firstLine);
+                    console.log("First Line: " + firstLine);
                     var arr = firstLine.split(" ");
+                    console.log("Arr: " + arr);
                     switch (arr[0]) {
                         case "bb1302":
                             newCapture.code = "bb1302";
