@@ -191,7 +191,7 @@ function processAttachment(senderID, messageAttachments){
                     newCapture.name = "";
                     newCapture.user = "";
                     newCapture.score = parseFloat(arr[3].replace(')', ''));
-                    newUser.save(function (err, data) {
+                    newCapture.save(function (err, data) {
                         if (err) {
                             console.log(err);
                         }
