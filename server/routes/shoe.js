@@ -27,6 +27,7 @@ router.post('/shoe', (req, res) => {
   var response = {};
 
   var newShoe = new shoe();
+  console.log(req.body.code);
   newShoe.code = req.body.code;
   newShoe.name = req.body.name;
   newShoe.price = req.body.price;
@@ -34,9 +35,7 @@ router.post('/shoe', (req, res) => {
   newShoe.imageUrl = req.body.imageUrl;
   newShoe.itemUrl = req.body.itemUrl;
 
-  shoe.findOne({$or:[
-      {code:code}, {name:name}
-      ]}, function(err, data){
+  shoe.findOne({code: newShoe.code}, function(err, data){
       if(err){
         response = {"error": true, "message": "Fetching error"};
         res.status(500).json(response);
@@ -60,6 +59,7 @@ router.post('/shoe', (req, res) => {
 router.get('/shoe/:code', (req,res) => {
 
     var response = {};
+    var code = req.params.code;
     shoe.findOne({code: code}, function(err, data){
         if(err){
             response = {"error": true, "message": data};
@@ -75,6 +75,7 @@ router.delete('/shoe/:code', (req, res) => {
 
   var response = {};
 
+  var code = req.params.code;
   shoe.delete({code: code}, function(err, data){
     if(err){
       response = {"error": true, "message": "No se pudo eliminar"};

@@ -27,16 +27,14 @@ router.post('/capture', (req, res) => {
   var response = {};
 
   var newCapture = new capture();
-    newCapture.code = req.body.code;
-    newCapture.name = req.body.name;
-    newCapture.price = req.body.price;
-    newCapture.description = req.body.description;
-    newCapture.imageUrl = req.body.imageUrl;
-    newCapture.itemUrl = req.body.itemUrl;
+  newCapture.id = req.body.id;
+  newCapture.user = req.body.user;
+  newCapture.name = req.body.name;
+  newCapture.code = req.body.code;
+  newCapture.score = req.body.score;
 
-    capture.findOne({$or:[
-      {code:code}, {name:name}
-      ]}, function(err, data){
+
+    capture.findOne({id: newCapture.id}, function(err, data){
       if(err){
         response = {"error": true, "message": "Fetching error"};
         res.status(500).json(response);
@@ -60,6 +58,7 @@ router.post('/capture', (req, res) => {
 router.get('/capture/:id', (req,res) => {
 
     var response = {};
+    var id = req.params.id;
     capture.findOne({id: id}, function(err, data){
         if(err){
             response = {"error": true, "message": data};
@@ -74,7 +73,7 @@ router.get('/capture/:id', (req,res) => {
 router.delete('/capture/:id', (req, res) => {
 
   var response = {};
-
+  var id = req.params.id;
   capture.delete({id: id}, function(err, data){
     if(err){
       response = {"error": true, "message": "No se pudo eliminar"};
