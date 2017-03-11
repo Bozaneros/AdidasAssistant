@@ -25,8 +25,8 @@ const INTENTS = {
 };
 
 var bot = new builder.UniversalBot(connector, function (session) {
+    console.log('Attachment?');
     if(session.message.attachment)
-
     {
         console.log('Inicio Tensorflow');
         var python = require('child_process').spawn(
