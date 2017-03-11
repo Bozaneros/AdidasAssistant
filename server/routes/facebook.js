@@ -203,7 +203,7 @@ function processAttachment(senderID, messageAttachments){
                                 res.status(500).json(response);
                             } else {
                                 var randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
-                                response = randBegin + "\"" + data.name + "\"" + ". " + data.description
+                                var response = randBegin + "\"" + data.name + "\"" + ". " + data.description
                                     + ". You have them for " + data.price + "$ at adidas.com";
                                 sendTextMessage(senderID, response);
                             }
