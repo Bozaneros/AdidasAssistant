@@ -53,4 +53,12 @@ app.set('port', port);
  */
 const server = http.createServer(app);
 
-server.listen(port, () => console.log(`API running on localhost:${port}`));
+mongoose.connect(config.database + '/Bozaneros', function(err, res) {
+    if(err) {
+        console.log('ERROR: connecting to Database. ' + err);
+    } else {
+        //initBD();
+        /* Listen on provided port, on all network interfaces. */
+        server.listen(port, () => console.log(`API running on localhost:${port}`));
+    }
+});

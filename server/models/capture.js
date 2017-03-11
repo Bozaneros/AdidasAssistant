@@ -13,4 +13,4 @@ var captureSchema = new mongoSchema({
     "score": Number
 });
 
-module.exports = mongoose.model('capture', captureSchema);
+module.exports = mongoose.model('capture', captureSchema, 'capture');
