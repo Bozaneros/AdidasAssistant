@@ -37,6 +37,7 @@ var bot = new builder.UniversalBot(connector, function (session) {
         var output = "";
         python.stdout.on('data', function(data){ output += data });
         python.on('close', function(code){
+            console.log(output);
             if (code !== 0) {
                 session.send("Error");
                 return res.send(500, code);
