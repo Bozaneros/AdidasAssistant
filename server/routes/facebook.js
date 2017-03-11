@@ -30,6 +30,7 @@ router.get('', function(req, res) {
 });
 
 router.post('', function (req, res) {
+
     var data = req.body;
 
     // Make sure this is a page subscription
@@ -63,6 +64,18 @@ router.post('', function (req, res) {
 function receivedMessage(event) {
 
     var senderID = event.sender.id;
+
+    request({
+        uri: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: { access_token: config.page_token },
+        method: 'POST',
+        json: {"recipient": {"id": senderID},
+            "sender_action":"typing_on"}
+    }, function (error, response, body){
+        console.log("AAAAAAAAAAAAAAAAAH " + error);
+        console.log("BBBBBBBBBBBBBBBBEH " + response);
+        console.log("CEEEEEEEEEEEEEEEEH " + body);
+    });
 
     //TODO: Hacer algo con el nombre del usuario (y mas info)
     console.log("Llamando a fb");
@@ -121,6 +134,7 @@ function receivedMessage(event) {
 
 function processAttachment(senderID, messageAttachments){
     console.log(messageAttachments);
+
     sendTextMessage(senderID, "Attachments eh");
 }
 
