@@ -1,5 +1,6 @@
 {
   "database": "127.0.0.1",
-  "port": 3000,
-  "secret": "donbozan"
+  "port": 8080,
+  "secret": "donbozan",
+  "verify_token": "don_bozan_loves_guacks"
 }
