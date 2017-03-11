@@ -18,7 +18,8 @@ var mongoose = require('mongoose');
 const api = '/api';
 const root = require('./server/routes/root');
 const register = require('./server/routes/register');
-const bot = require('./server/routes/bot');
+//const bot = require('./server/routes/bot');
+const facebook = require('./server/routes/facebook');
 
 const app = express();
 
@@ -31,7 +32,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Set our api routes
-app.use(api, bot);
+app.use('/webhook', facebook);
+//app.use(api, bot);
 app.use(api, register);
 app.use(api, root);
 
