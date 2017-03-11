@@ -10,6 +10,7 @@ var user = require('../models/user');
 /* GET api listing. */
 router.get('/login', (req, res) => {
 
+
 });
 
 module.exports = router;

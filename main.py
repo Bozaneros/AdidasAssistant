@@ -36,10 +36,14 @@ For testing through python, change and run this code.
 import numpy as np
 import tensorflow as tf
 import sys
+import requests
+import time
+import mimetypes
+from PIL import Image
 
-imagePath = '/tmp/imagenet/flower.jpg'
-modelFullPath = '/tmp/output_graph.pb'
-labelsFullPath = '/tmp/output_labels.txt'
+imagePath = ''
+modelFullPath = 'graph.pb'
+labelsFullPath = 'labels.txt'
 
 
 def create_graph():
@@ -82,12 +86,30 @@ def run_inference_on_image():
         answer = labels[top_k[0]]
         return answer
 
+def download_from_url(url):
+    t0 = time.clock()
+    response = requests.get(url, stream=True)
+    content_type = response.headers['content-type']
+    extension = mimetypes.guess_extension(content_type)
+    global imagePath
+    imagePath = str(t0) + extension
+    with open(imagePath, 'wb') as handle:
+
+        if not response.ok:
+            print(response)
+
+        for block in response.iter_content(1024):
+            if not block:
+                break
+
+            handle.write(block)
+    img = Image.open(imagePath)
+    imagePath = imagePath.replace(extension, '.jpg')
+    img.save(imagePath)
+
 
 if __name__ == '__main__':
-    if len(sys.argv) == 4:
-        imagePath = str(sys.argv[1])
-        modelFullPath = str(sys.argv[2])
-        labelsFullPath = str(sys.argv[3])
+    if len(sys.argv) == 2:
+        url = str(sys.argv[1])
+        download_from_url(url)
         print(run_inference_on_image())
-    else:
-        print("Incorrect format: Pass as arguments the image, model and labels paths in this order")

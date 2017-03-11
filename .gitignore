@@ -1,3 +1,7 @@
+# Tensorflow
+graph.pb
+labels.txt
+
 # Logs
 logs
 *.log

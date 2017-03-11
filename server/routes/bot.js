@@ -7,6 +7,7 @@ const router = express.Router();
 const config = require('../config/config');
 const builder = require('botbuilder');
 const recast = require('recastai');
+const util = require('util');
 
 const getGreetings = require('../intents/greetings');
 
@@ -24,19 +25,22 @@ const INTENTS = {
 };
 
 var bot = new builder.UniversalBot(connector, function (session) {
-    if(session.message.attachment)
-
+    console.log('Attachment?');
+    if(session.message.attachment.length > 0)
     {
+        console.log('Inicio Tensorflow');
         var python = require('child_process').spawn(
             'python',
             // second argument is array of parameters, e.g.:
-            ["/main.py"
+            ["../main.py"
                 , session.message.attachment.contentUrl
             ]
         );
+        console.log('Fin Tensorflow');
         var output = "";
         python.stdout.on('data', function(data){ output += data });
         python.on('close', function(code){
+            console.log(output);
             if (code !== 0) {
                 session.send("Error");
                 return res.send(500, code);
