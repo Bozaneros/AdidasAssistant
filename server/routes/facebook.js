@@ -154,7 +154,9 @@ function processAttachment(senderID, messageAttachments){
                 var newCapture = new capture();
                 exec(cmd, function (error, stdout, stderr) {
                     console.log(error);
+                    console.log(stdout);
                     var firstLine = stdout.split('\n')[0];
+                    console.log(firstLine);
                     var arr = firstLine.split(" ");
                     switch (arr[0]) {
                         case "bb1302":
