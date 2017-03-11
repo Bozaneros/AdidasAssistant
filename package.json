@@ -20,6 +20,7 @@
     "jsonwebtoken": "^7.3.0",
     "lodash": "^4.17.4",
     "mongoose": "^4.8.5",
+    "recastai": "^2.3.0",
     "request": "^2.81.0"
   },
   "devDependencies": {}
