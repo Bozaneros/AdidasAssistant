@@ -195,7 +195,8 @@ function processAttachment(senderID, messageAttachments){
                         if (err) {
                             console.log(err);
                         }
-                        shoe.findOne({code: newCapture.code}, function (err, data) {
+                        console.log(newCapture);
+                        shoe.findOne({'code': newCapture.code}, function (err, data) {
                             if (err) {
                                 //Error servidor
                                 response = {"error": true, "message": "Fetching error"};
