@@ -30,7 +30,7 @@ var bot = new builder.UniversalBot(connector, function (session) {
         var python = require('child_process').spawn(
             'python',
             // second argument is array of parameters, e.g.:
-            ["main.py"
+            ["../main.py"
                 , session.message.attachment.contentUrl
             ]
         );
