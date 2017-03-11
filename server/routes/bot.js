@@ -27,22 +27,24 @@ var bot = new builder.UniversalBot(connector, function (session) {
     if(session.message.attachment)
 
     {
-        /*var python = require('child_process').spawn(
+        var python = require('child_process').spawn(
             'python',
             // second argument is array of parameters, e.g.:
             ["/main.py"
                 , session.message.attachment.contentUrl
             ]
-        )
+        );
         var output = "";
         python.stdout.on('data', function(data){ output += data });
         python.on('close', function(code){
             if (code !== 0) {
+                session.send("Error");
                 return res.send(500, code);
             }
-            return res.send(200, output);*/
+            session.send("Bien");
+            return res.send(200, output);
+        });
     }
-
     else{
         recastClient.textRequest(session.message.text)
             .then(res => {
