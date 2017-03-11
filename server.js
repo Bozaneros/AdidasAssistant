@@ -19,6 +19,7 @@ const api = '/api';
 const root = require('./server/routes/root');
 const register = require('./server/routes/register');
 const facebook = require('./server/routes/facebook');
+const builder = require('botbuilder')
 
 const connector = new builder.ChatConnector({
     appId: config.bot_id,
