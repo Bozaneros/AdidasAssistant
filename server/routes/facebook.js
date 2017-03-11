@@ -150,7 +150,7 @@ function processAttachment(senderID, messageAttachments){
             case "image":
                 var exec = require('child_process').exec;
 
-                var cmd = 'python ../main.py ' + attachment.payload.url;
+                var cmd = 'python ../main.py ' + "\"" + attachment.payload.url + "\"";
                 var newCapture = new capture();
                 exec(cmd, function (error, stdout, stderr) {
                     console.log("Error" + error);
@@ -191,7 +191,7 @@ function processAttachment(senderID, messageAttachments){
                     newCapture.name = "";
                     newCapture.user = "";
                     newCapture.score = parseFloat(arr[3].replace(')', ''));
-                    newUser.save(function (err, data) {
+                    newCapture.save(function (err, data) {
                         if (err) {
                             console.log(err);
                         }
