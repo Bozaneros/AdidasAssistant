@@ -8,7 +8,7 @@ const config = require('../config/config');
 const builder = require('botbuilder');
 const recast = require('recastai');
 
-const getGreetings = require('../core/intents');
+const getGreetings = require('../intents/greetings');
 
 const recastClient = new recast.Client(config.recast_dev);
 
