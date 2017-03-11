@@ -18,18 +18,7 @@ var mongoose = require('mongoose');
 const api = '/api';
 const root = require('./server/routes/root');
 const register = require('./server/routes/register');
-const facebook = require('./server/routes/facebook');
-const builder = require('botbuilder')
-
-const connector = new builder.ChatConnector({
-    appId: config.bot_id,
-    appPassword: config.bot_pass,
-})
-const bot = new builder.UniversalBot(connector)
-// Event when Message received
-bot.dialog('/', (session) => {
-    console.log(session.message.text)
-})
+const bot = require('./server/routes/bot');
 
 const app = express();
 
@@ -42,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Set our api routes
-//app.use('/webhook', facebook);
+app.use(api, bot);
 app.use(api, register);
 app.use(api, root);
 
