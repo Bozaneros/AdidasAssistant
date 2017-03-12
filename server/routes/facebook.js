@@ -615,53 +615,55 @@ function sendHistory(senderID){
 
             console.log(data.length);
             var elements = [];
+            var codes = [];
             var wait = 0;
             data.forEach(function(capture) {
-                console.log("===================================> " + capture.code);
-                shoe.findOne({'code': capture.code}, function(err, res){
-                    if(err){
-                        console.log("ERROR");
-                    } else{
+                codes.push(capture.code);
+            });
+
+            console.log("===================================> " + capture.code);
+            shoe.find({'code': {$in: codes}}, function(err, res){
+                if(err){
+                    console.log("ERROR");
+                } else{
+                    res.forEach(function(response){
                         var element = {
-                            title: res.name,
-                            item_url: res.itemUrl,
-                            image_url: res.imageUrl,
+                            title: response.name,
+                            item_url: response.itemUrl,
+                            image_url: response.imageUrl,
                             buttons: [{
                                 type: "web_url",
-                                url: res.itemUrl,
+                                url: response.itemUrl,
                                 title: "Go to shop"
                             }, {
                                 type: "postback",
                                 title: "Show more info",
-                                payload: '{ "payloadName": "show_info", "body": { "code": "' + res.code + '"}}'
+                                payload: '{ "payloadName": "show_info", "body": { "code": "' + response.code + '"}}'
                             }],
                         };
                         elements.push(element);
-
-                    }
-                    wait = wait + 1;
-                });
-            });
-
-            while(wait != max){console.log(wait + " - " + max)}
-            console.log("==================================================");
-            console.log(elements);
-            console.log("==================================================");
-            let messageData = {
-                recipient: {
-                    id: senderID
-                },
-                message: {
-                    attachment: {
-                        type: "template",
-                        payload: {
-                            template_type: "generic",
-                            elements: elements
+                    });
+                    console.log("==================================================");
+                    console.log(elements);
+                    console.log("==================================================");
+                    let messageData = {
+                        recipient: {
+                            id: senderID
+                        },
+                        message: {
+                            attachment: {
+                                type: "template",
+                                payload: {
+                                    template_type: "generic",
+                                    elements: elements
+                                }
+                            }
                         }
-                    }
+                    };
+                    callSendAPI(messageData);
+
                 }
-            };
-            callSendAPI(messageData);
+            });
         }
     });
 }
