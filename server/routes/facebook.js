@@ -605,7 +605,7 @@ function sendHistory(senderID){
 
             let max = data.length;
             if(data.length > 3){
-                data = data.slice(0,2);
+                data = data.slice(0,3);
                 max = 3;
             }
 
