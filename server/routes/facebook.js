@@ -140,33 +140,21 @@ function processText(senderID, messageText, userName){
                         console.log('Está pidiendo info de un modelo');
                         let entity = res.get('trainers');
 
-                        // Tries to recover the context of the conversation
-                        if (!entity) {
-                            context.findOne({'user': userName}, function (err, data) {
+                        capture.findOne({}, {}, { sort: { 'date' : -1 } }, function(err, cap) {
+                            shoe.findOne({'code': cap.code}, function (err, data) {
                                 if (err) {
                                     //Error servidor
                                     response = {"error": true, "message": "Fetching error"};
                                     res.status(500).json(response);
                                 } else {
-                                    entity = data.lastEntity;
+                                    if(cap.score < 0.01){
+                                        sendTextMessage(senderID, "Sorry... I don't know what product is...");
+                                    } else {
+                                        sendCardMessage(senderID, data);
+                                    }
                                 }
-
-                                sendCardMessage(senderID, entity);
-                            })
-                        }
-                        else {
-
-                            // Updates the last entity provided by the user
-                            var query = {},
-                                update = { lastEntity: entity },
-                                options = { upsert: true, new: true, setDefaultsOnInsert: true };
-
-                            context.findOneAndUpdate(query, update, options, function(err, data) {
-                                if (err) return;
-                                else entity = data.lastEntity;
                             });
-                        }
-
+                        });
                         break;
                     case 'help':
                         console.log("Está pidiendo ayuda");
@@ -281,12 +269,12 @@ function processAttachment(senderID, messageAttachments, userName){
                                 res.status(500).json(response);
                             } else {
                                 if(newCapture.score < threshold){
-
+                                    sendTextMessage(senderID, "Sorry... I don't know what product is...");
                                 } else {
                                     sendCardMessage(senderID, data);
                                 }
                             }
-                        })
+                        });
                     });
                     console.log(stdout);
                     console.log(stderr);
@@ -333,7 +321,6 @@ function processAttachment(senderID, messageAttachments, userName){
     });
 
 }
-
 function processUrl(senderID, messageAttachments, userName){
     console.log(messageAttachments);
     let exec = require('child_process').exec;
@@ -393,23 +380,23 @@ function processUrl(senderID, messageAttachments, userName){
 
                 // Makes HTTP request to API (GET)
                 /*
-                request({
-                    uri: "https://bozaneros.ddns.net/api/shoe/" + newCapture.code,
-                    method: "GET",
-                    timeout: 10000
-                }, function(error, data) {
-                    if (err) {
-                        //Error servidor
-                        response = {"error": true, "message": "Fetching error"};
-                        res.status(500).json(response);
-                    } else {
-                        let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
-                        let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
-                            + ". You have them for " + data.price + "$ at adidas.com";
-                        sendTextMessage(senderID, response);
-                    }
-                });
-                */
+                 request({
+                 uri: "https://bozaneros.ddns.net/api/shoe/" + newCapture.code,
+                 method: "GET",
+                 timeout: 10000
+                 }, function(error, data) {
+                 if (err) {
+                 //Error servidor
+                 response = {"error": true, "message": "Fetching error"};
+                 res.status(500).json(response);
+                 } else {
+                 let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
+                 let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
+                 + ". You have them for " + data.price + "$ at adidas.com";
+                 sendTextMessage(senderID, response);
+                 }
+                 });
+                 */
 
 
                 shoe.findOne({'code': newCapture.code}, function (err, data) {
@@ -420,10 +407,10 @@ function processUrl(senderID, messageAttachments, userName){
                     } else {
 
                         sendCardMessage(senderID, data);
-                      /*  let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
-                        let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
-                            + ". You have them for " + data.price + "$ at adidas.com";
-                        sendTextMessage(senderID, response);*/
+                        /*  let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
+                         let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
+                         + ". You have them for " + data.price + "$ at adidas.com";
+                         sendTextMessage(senderID, response);*/
                     }
                 })
             });
@@ -440,6 +427,7 @@ function managePostBack(event){
     let senderID = event.sender.id;
     let recipientID = event.recipient.id;
     let timeOfPostback = event.timestamp;
+    let threshold = 0.1;
 
     // The 'payload' param is a developer-defined field which is set in a postback
     // button for Structured Messages.
@@ -448,8 +436,21 @@ function managePostBack(event){
     switch(JSON.parse(payload).payloadName){
         case "show_info":
             console.log("Mostrando info producto");
-            //TODO: enviar mensaje con el cuerpo del producto
-
+            capture.findOne({}, {}, { sort: { 'date' : -1 } }, function(err, cap) {
+                shoe.findOne({'code': cap.code}, function (err, data) {
+                    if (err) {
+                        //Error servidor
+                        response = {"error": true, "message": "Fetching error"};
+                        res.status(500).json(response);
+                    } else {
+                        if(cap.score < threshold){
+                            sendTextMessage(senderID, "Sorry... I don't know what product is...");
+                        } else {
+                            sendCardMessage(senderID, data);
+                        }
+                    }
+                });
+            });
             break;
         case "recognize":
             console.log("Quiere reconocer imagen");
