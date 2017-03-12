@@ -153,11 +153,13 @@ function processAttachment(senderID, messageAttachments, userName){
     // Iterate over each entry - there may be multiple if batched
 
     messageAttachments.forEach(function(attachment) {
-        var imageUrl = attachment.url;
+        var imageUrl = attachment.payload.url;
         switch (attachment.type) {
-            case "image":
-                imageUrl = attachment.payload.url;
             case "fallback":
+                imageUrl = attachment.url;
+                imageUrl = imageUrl.replace("https://l.facebook.com/l.php?u=", "");
+                imageUrl = decodeURIComponent(imageUrl);
+            case "image":
                 var exec = require('child_process').exec;
 
                 var cmd = 'python ../main.py ' + "\"" + imageUrl + "\"";
