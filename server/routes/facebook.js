@@ -199,7 +199,7 @@ function processAttachment(senderID, messageAttachments, userName){
             case "image":
                 let exec = require('child_process').exec;
 
-                let cmd = 'python ../main.py ' + "\"" + imageUrl + "\"";
+                let cmd = 'python main.py ' + "\"" + imageUrl + "\"";
                 let newCapture = new capture();
                 exec(cmd, function (error, stdout, stderr) {
                     console.log("Error" + error);
@@ -239,6 +239,7 @@ function processAttachment(senderID, messageAttachments, userName){
                     newCapture.id = senderID;
                     newCapture.name = userName;
                     newCapture.score = parseFloat(arr[3].replace(')', ''));
+                    newCapture.date = Date.now();
                     newCapture.save(function (err, data) {
                         if (err) {
                             console.log(err);
@@ -316,7 +317,7 @@ function processAttachment(senderID, messageAttachments, userName){
             case "audio":
                 let execAudio = require('child_process').exec;
 
-                let cmdAudio = 'python ../speech.py ' + "\"" + attachment.payload.url + "\"";
+                let cmdAudio = 'python speech.py ' + "\"" + attachment.payload.url + "\"";
                 execAudio(cmdAudio, function (error, stdout, stderr) {
                     console.log("Error" + error);
                     console.log("Stdout: " + stdout);
@@ -336,7 +337,7 @@ function processUrl(senderID, messageAttachments, userName){
     console.log(messageAttachments);
     let exec = require('child_process').exec;
 
-    let cmd = 'python ../main.py ' + "\"" + messageAttachments + "\"";
+    let cmd = 'python main.py ' + "\"" + messageAttachments + "\"";
     let newCapture = new capture();
     exec(cmd, function (error, stdout, stderr) {
         console.log("Error" + error);
@@ -451,7 +452,6 @@ function managePostBack(event){
             break;
         case "history":
             console.log("Quiere mostrar el historial");
-            //TODO historial
             sendHistory(senderID);
             break;
         case "shops":
@@ -536,42 +536,6 @@ function sendCardMessage(recipientId, trainer){
     callSendAPI(messageData);
 }
 
-function showCaptureOptions(recipientId){
-    let messageData = {
-        recipient: {
-            id: recipientId
-        },
-        message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "generic",
-                    elements: [{
-                        title: "This are the options you can do:",
-                        subtitle: "",
-                        buttons: [{
-                            type: "postback",
-                            title: "Recognize trainers",
-                            payload: '{ "payloadName": "recognize", "body": {}}'
-
-                        }, {
-                            type: "postback",
-                            title: "Show my history",
-                            payload: '{ "payloadName": "history", "body": {}}'
-                        }, {
-                            type: "postback",
-                            title: "Show closest shop",
-                            payload: '{ "payloadName": "shops", "body": {}}'
-                        }],
-                    }]
-                }
-            }
-        }
-    };
-
-    callSendAPI(messageData);
-}
-
 function sendTextMessage(recipientId, messageText) {
     console.log(messageText);
     let messageData = {
@@ -629,7 +593,65 @@ function isUrl(url){
 }
 
 function sendHistory(senderID){
+    capture.find({id: senderID}).sort({'submittedDate': 'desc'}).exec(function(err, data){
+        if(err){
+            sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
+        } else{
 
+            console.log(data);
+
+            if(data.length > 3){
+                data = data.slice(0,1,2);
+            }
+
+            console.log(data);
+
+            let elements = [];
+            data.forEach(function(capture) {
+                console.log("===================================> " + capture.code);
+                shoe.findOne({'code': capture.code}, function(err, res){
+                    if(err){
+                        console.log("ERROR");
+                    } else{
+                        let element = {
+                            title: res.name,
+                            item_url: res.itemUrl,
+                            image_url: res.imageUrl,
+                            buttons: [{
+                                type: "web_url",
+                                url: res.itemUrl,
+                                title: "Go to shop"
+                            }, {
+                                type: "postback",
+                                title: "Show more info",
+                                payload: '{ "payloadName": "show_info", "body": { "code": "' + res.code + '"}}'
+                            }],
+                        };
+                        elements.push(element);
+                    }
+                });
+            });
+
+            console.log("==================================================");
+            console.log(elements);
+            console.log("==================================================");
+            let messageData = {
+                recipient: {
+                    id: senderID
+                },
+                message: {
+                    attachment: {
+                        type: "template",
+                        payload: {
+                            template_type: "generic",
+                            elements: elements
+                        }
+                    }
+                }
+            };
+            callSendAPI(messageData);
+        }
+    });
 }
 
 module.exports = router;

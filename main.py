@@ -40,7 +40,7 @@ import requests
 import time
 import mimetypes
 from PIL import Image
-import urllib.request as urllib2
+import urllib2 as urllib2
 
 imagePath = ''
 modelFullPath = 'graph.pb'
