@@ -133,6 +133,9 @@ function processText(senderID, messageText, userName){
                     case 'image':
                         sendTextMessage(senderID, "Insert a photo or a photo in an url containing Adidas trainers to recognize which model are they");
                         break;
+                    case 'history':
+                        sendHistory(senderID);
+                        break;
                     case 'askformodel':
                         console.log('Está pidiendo info de un modelo');
                         let entity = res.get('trainers');
