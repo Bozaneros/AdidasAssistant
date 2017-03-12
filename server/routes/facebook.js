@@ -138,33 +138,21 @@ function processText(senderID, messageText, userName){
                         console.log('Está pidiendo info de un modelo');
                         let entity = res.get('trainers');
 
-                        // Tries to recover the context of the conversation
-                        if (!entity) {
-                            context.findOne({'user': userName}, function (err, data) {
+                        capture.findOne({}, {}, { sort: { 'date' : -1 } }, function(err, cap) {
+                            shoe.findOne({'code': cap.code}, function (err, data) {
                                 if (err) {
                                     //Error servidor
                                     response = {"error": true, "message": "Fetching error"};
                                     res.status(500).json(response);
                                 } else {
-                                    entity = data.lastEntity;
+                                    if(cap.score < threshold){
+                                        sendTextMessage(senderID, "Sorry... I don't know what product is...");
+                                    } else {
+                                        sendCardMessage(senderID, data);
+                                    }
                                 }
-
-                                sendCardMessage(senderID, entity);
-                            })
-                        }
-                        else {
-
-                            // Updates the last entity provided by the user
-                            var query = {},
-                                update = { lastEntity: entity },
-                                options = { upsert: true, new: true, setDefaultsOnInsert: true };
-
-                            context.findOneAndUpdate(query, update, options, function(err, data) {
-                                if (err) return;
-                                else entity = data.lastEntity;
                             });
-                        }
-
+                        });
                         break;
                     case 'help':
                         console.log("Está pidiendo ayuda");
