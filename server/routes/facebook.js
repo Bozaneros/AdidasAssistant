@@ -109,46 +109,52 @@ function receivedMessage(event) {
             } else if(isUrl(messageText)){
                 processUrl(senderID, messageText, userName);
             } else if (messageText) {
+                processText(senderID, messageText);
 
-                recastClient.textRequest(messageText)
-                    .then(res => {
-                        const intent = res.intent();
-                        if (intent != null) {
-                            switch (intent.slug) {
-                                case 'greetings':
-                                    console.log("Sí es un saludo");
-                                    sendTextMessage(senderID, INTENTS[intent.slug]());
-                                    break;
-                                case 'image':
-                                    sendTextMessage(senderID, "Insert a photo or a photo in an url containing Adidas trainers to recognize which model are they");
-                                    break;
-                                case 'askformodel':
-                                    console.log('Está pidiendo info de un modelo');
-                                    sendCardMessage(senderID);
-                                    break;
-                                case 'help':
-                                    console.log("Está pidiendo ayuda");
-                                    showHelpOptions(senderID);
-                                    break;
-                                default:
-                                    console.log("No es un saludo");
-                                    sendTextMessage(senderID, "I'm sorry, I didn't understand what you said. Maybe you are speaking in another language? I only know English :(");
-                                    break;
-                            }
-                        } else {
-                            console.log("No es un saludo");
-                            sendTextMessage(senderID, "What? I don't get it...");
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        sendTextMessage(senderID, 'I need some sleep right now... Talk to me later!');
-                    });
+            } else {
+                console.error("Unable to find user");
+
             }
-        } else {
-            console.error("Unable to find user");
         }
     });
+}
+
+
+function processText(senderID, messageText){
+    recastClient.textRequest(messageText)
+        .then(res => {
+            const intent = res.intent();
+            if (intent != null) {
+                switch (intent.slug) {
+                    case 'greetings':
+                        console.log("Sí es un saludo");
+                        sendTextMessage(senderID, INTENTS[intent.slug]());
+                        break;
+                    case 'image':
+                        sendTextMessage(senderID, "Insert a photo or a photo in an url containing Adidas trainers to recognize which model are they");
+                        break;
+                    case 'askformodel':
+                        console.log('Está pidiendo info de un modelo');
+                        sendCardMessage(senderID);
+                        break;
+                    case 'help':
+                        console.log("Está pidiendo ayuda");
+                        showHelpOptions(senderID);
+                        break;
+                    default:
+                        console.log("No es un saludo");
+                        sendTextMessage(senderID, "I'm sorry, I didn't understand what you said. Maybe you are speaking in another language? I only know English :(");
+                        break;
+                }
+            } else {
+                console.log("No es un saludo");
+                sendTextMessage(senderID, "What? I don't get it...");
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            sendTextMessage(senderID, 'I need some sleep right now... Talk to me later!');
+        });
 }
 
 function processAttachment(senderID, messageAttachments, userName){
@@ -279,6 +285,17 @@ function processAttachment(senderID, messageAttachments, userName){
                             placesUrl;
                     sendTextMessage(senderID, textResponse);
                 });
+                break;
+            case "audio":
+                let execAudio = require('child_process').exec;
+
+                let cmdAudio = 'python ../speech.py ' + "\"" + attachment.payload.url + "\"";
+                execAudio(cmdAudio, function (error, stdout, stderr) {
+                    console.log("Error" + error);
+                    console.log("Stdout: " + stdout);
+                    processText(senderID, stdout);
+                });
+
                 break;
             default:
                 sendTextMessage(senderID, "I don't know about this...");
@@ -482,6 +499,42 @@ function sendCardMessage(recipientId, trainer){
                             type: "postback",
                             title: "Show more info",
                             payload: '{ "payloadName": "show_info", "body": { "code": "' + trainer.code + '"}}'
+                        }],
+                    }]
+                }
+            }
+        }
+    };
+
+    callSendAPI(messageData);
+}
+
+function showCaptureOptions(recipientId){
+    let messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "generic",
+                    elements: [{
+                        title: "This are the options you can do:",
+                        subtitle: "",
+                        buttons: [{
+                            type: "postback",
+                            title: "Recognize trainers",
+                            payload: '{ "payloadName": "recognize", "body": {}}'
+
+                        }, {
+                            type: "postback",
+                            title: "Show my history",
+                            payload: '{ "payloadName": "history", "body": {}}'
+                        }, {
+                            type: "postback",
+                            title: "Show closest shop",
+                            payload: '{ "payloadName": "shops", "body": {}}'
                         }],
                     }]
                 }
