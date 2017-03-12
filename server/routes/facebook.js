@@ -229,6 +229,10 @@ function processAttachment(senderID, messageAttachments, userName){
                     console.log(stderr);
                 });
                 break;
+            case "location":
+                console.log(attachment.payload.coordinates);
+                sendTextMessage(senderID, "I don't know about this...");
+                break;
             default:
                 sendTextMessage(senderID, "I don't know about this...");
                 break;
