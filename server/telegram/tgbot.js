@@ -5,7 +5,19 @@
 const TOKEN = "373837870:AAFk_2f8j7WQz7JWjyX2mefK8ZnQ1wf0X60";
 const URL = "https://api.telegram.org/bot" + TOKEN + "/";
 var req = require('request');
+const config = require('../config/config');
 var querystring = require('querystring');
+var recast = require('recastai');
+
+const getGreetings = require('../intents/greetings');
+const getAskForModel= require('../intents/askformodel');
+
+const recastClient = new recast.Client(config.recast_dev);
+
+const INTENTS = {
+    greetings: getGreetings,
+    askformodel: getAskForModel
+};
 
 function get_json_from_url(url, callback){
   // Obtain json with all the messages our bot received
@@ -57,11 +69,51 @@ function send_message(text, chat_id){
 
 function answer_messages(updates){
   for(var index in updates){
-    ////////// NEED TO CHANGE THIS LINE TO PROCESS MESSAGE ///////////
-    var text = updates[index].message.text;
-    //////////////////////////////////////////////////////////////////
+    console.log(updates[index]);
+    console.log(updates[index].message.photo);
     var chat = updates[index].message.chat.id;
-    send_message(text, chat);
+    if(updates[index].message.text != null){
+      (function(chat) {
+        recastClient.textRequest(updates[index].message.text)
+                        .then(res => {
+                            const intent = res.intent();
+                            if (intent != null) {
+                                switch (intent.slug) {
+                                    case 'greetings':
+                                        console.log("Sí es un saludo");
+                                        send_message(INTENTS[intent.slug](), chat);
+                                        break;
+                                    case 'image':
+                                        send_message("Insert a photo (always compressed!) or a photo in an url containing Adidas trainers to recognize which model are they", chat);
+                                        break;
+                                    case 'askformodel':
+                                        console.log('Está pidiendo info de un modelo');
+                                        //sendCardMessage(senderID);
+                                        break;
+                                    case 'help':
+                                        console.log("Está pidiendo ayuda");
+                                        //showHelpOptions(senderID);
+                                        break;
+                                    default:
+                                        console.log("No es un saludo");
+                                        send_message("I'm sorry, I didn't understand what you said. Maybe you are speaking in another language? I only know English :(", chat);
+                                        break;
+                                }
+                            } else {
+                                console.log("No es un saludo");
+                                send_message("What? I don't get it...", chat);
+                            }
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            send_message('I need some sleep right now... Talk to me later!', chat);
+                        });
+      })(chat);
+    } else if(updates[index].message.document != null && updates[index].message.document.mime_type.split('/')[0] == 'image'){
+      console.log("nos ha enviado una imagen lol");
+    } else if(updates[index].message.photo != null){
+      console.log("nos ha enviado una imagen comprimida lol");
+    }
   }
 }
 
