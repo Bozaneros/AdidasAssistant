@@ -208,7 +208,13 @@ function processAttachment(senderID, messageAttachments, userName){
                             console.log(err);
                         }
                         console.log(newCapture);
-                        shoe.findOne({'code': newCapture.code}, function (err, data) {
+
+                        // Makes HTTP request to API (GET)
+                        request({
+                            uri: "https://bozaneros.ddns.net/api/shoe/" + newCapture.code,
+                            method: "GET",
+                            timeout: 10000
+                        }, function(error, data) {
                             if (err) {
                                 //Error servidor
                                 response = {"error": true, "message": "Fetching error"};
@@ -223,7 +229,24 @@ function processAttachment(senderID, messageAttachments, userName){
                                     sendTextMessage(senderID, response);
                                 }
                             }
-                        })
+                        });
+
+                        /*shoe.findOne({'code': newCapture.code}, function (err, data) {
+                            if (err) {
+                                //Error servidor
+                                response = {"error": true, "message": "Fetching error"};
+                                res.status(500).json(response);
+                            } else {
+                                if(newCapture.score < threshold){
+
+                                } else {
+                                    let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
+                                    let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
+                                        + ". You have them for " + data.price + "$ at adidas.com";
+                                    sendTextMessage(senderID, response);
+                                }
+                            }
+                        })*/
                     });
                     console.log(stdout);
                     console.log(stderr);
@@ -292,6 +315,26 @@ function processUrl(senderID, messageAttachments, userName){
                     console.log(err);
                 }
                 console.log(newCapture);
+
+                // Makes HTTP request to API (GET)
+                request({
+                    uri: "https://bozaneros.ddns.net/api/shoe/" + newCapture.code,
+                    method: "GET",
+                    timeout: 10000
+                }, function(error, data) {
+                    if (err) {
+                        //Error servidor
+                        response = {"error": true, "message": "Fetching error"};
+                        res.status(500).json(response);
+                    } else {
+                        let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
+                        let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
+                            + ". You have them for " + data.price + "$ at adidas.com";
+                        sendTextMessage(senderID, response);
+                    }
+                });
+
+                /*
                 shoe.findOne({'code': newCapture.code}, function (err, data) {
                     if (err) {
                         //Error servidor
@@ -303,7 +346,7 @@ function processUrl(senderID, messageAttachments, userName){
                             + ". You have them for " + data.price + "$ at adidas.com";
                         sendTextMessage(senderID, response);
                     }
-                })
+                })*/
             });
             console.log(stdout);
         }
