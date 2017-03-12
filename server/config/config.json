@@ -4,5 +4,6 @@
   "secret": "donbozan",
   "verify_token": "don_bozan_loves_guacks",
   "page_token": "EAAUzfZBvOw94BAI3TPgWSbGMF9ko2S5dYB9pTyztgTOFbeqws1ZA3byIGJkcdfpgos5arLSLRfy1hFdvnGCA8Lka8mn2d80hBgD1SFk9GPUsZBuOZAg45r0rG8EcV9SXw66ch5wyXdRYsIpwvoKk8ZC5JQ18kSpWsjKfiRzwVEgZDZD",
-  "recast_dev": "fe8f864c353022cea8456b2a2de7ac7a"
+  "recast_dev": "fe8f864c353022cea8456b2a2de7ac7a",
+  "maps_api_key": "AIzaSyDYTyAmzwQy7L96LrHjpl-QC4a1hxqO2Aw"
 }

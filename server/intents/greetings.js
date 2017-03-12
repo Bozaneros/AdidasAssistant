@@ -10,4 +10,5 @@ const getGreetings = () => {
     ];
     return random(answers)
 }
+
 module.exports = getGreetings;

@@ -9,7 +9,9 @@ var shoeSchema = new mongoSchema({
     "code": String,
     "name": String,
     "price": Number,
-    "description": String
+    "description": String,
+    "imageUrl": String,
+    "itemUrl": String
 });
 
-module.exports = mongoose.model('shoe', shoeSchema);
+module.exports = mongoose.model('shoe', shoeSchema, 'shoe');
