@@ -600,7 +600,7 @@ function sendHistory(senderID){
         if(err){
             sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
         } else{
-            console.log(data);
+            console.log(data.length);
 
 
             let max = data.length;
@@ -610,7 +610,7 @@ function sendHistory(senderID){
             }
 
 
-            console.log(data);
+            console.log(data.length);
             let elements = [];
             let wait = 0;
             data.forEach(function(capture) {
@@ -634,8 +634,9 @@ function sendHistory(senderID){
                             }],
                         };
                         elements.push(element);
-                        wait = wait + 1;
+
                     }
+                    wait = wait + 1;
                 });
             });
 
