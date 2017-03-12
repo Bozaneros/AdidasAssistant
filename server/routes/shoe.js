@@ -76,7 +76,7 @@ router.delete('/shoe/:code', (req, res) => {
   var response = {};
 
   var code = req.params.code;
-  shoe.delete({code: code}, function(err, data){
+  shoe.remove({code: code}, function(err, data){
     if(err){
       response = {"error": true, "message": "No se pudo eliminar"};
       res.status(403).json(response);
@@ -92,7 +92,7 @@ router.delete('/shoe', (req, res) => {
 
     var response = {};
 
-    shoe.delete({}, function(err, data){
+    shoe.remove({}, function(err, data){
         if(err){
             response = {"error": true, "message": "No se pudo eliminar"};
             res.status(403).json(response);
