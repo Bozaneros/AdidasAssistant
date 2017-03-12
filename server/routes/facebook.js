@@ -104,8 +104,10 @@ function receivedMessage(event) {
             var messageText = message.text;
             var messageAttachments = message.attachments;
 
-            if(messageAttachments){
-                processAttachment(senderID, messageAttachments);
+            if (messageAttachments) {
+                processAttachment(senderID, messageAttachments, userName);
+            } else if(isUrl(messageText)){
+                processUrl(senderID, messageText, userName);
             } else if (messageText) {
 
                 recastClient.textRequest(messageText)
@@ -145,9 +147,10 @@ function receivedMessage(event) {
     });
 }
 
-function processAttachment(senderID, messageAttachments){
+function processAttachment(senderID, messageAttachments, userName){
     console.log(messageAttachments);
     // Iterate over each entry - there may be multiple if batched
+
     messageAttachments.forEach(function(attachment) {
 
         switch (attachment.type) {
@@ -192,8 +195,7 @@ function processAttachment(senderID, messageAttachments){
                             break;
                     }
                     newCapture.id = senderID;
-                    newCapture.name = "";
-                    newCapture.user = "";
+                    newCapture.name = userName;
                     newCapture.score = parseFloat(arr[3].replace(')', ''));
                     newCapture.save(function (err, data) {
                         if (err) {
@@ -223,6 +225,79 @@ function processAttachment(senderID, messageAttachments){
         }
     });
 
+}
+
+function processUrl(senderID, messageAttachments, userName){
+    console.log(messageAttachments);
+    var exec = require('child_process').exec;
+
+    var cmd = 'python ../main.py ' + "\"" + attachment.payload.url + "\"";
+    var newCapture = new capture();
+    exec(cmd, function (error, stdout, stderr) {
+        console.log("Error" + error);
+        console.log("Stdout: " + stdout);
+        var firstLine = stdout.split('\n')[0];
+        console.log("First Line: " + firstLine);
+        var arr = firstLine.split(" ");
+        console.log("Arr: " + arr);
+        switch (arr[0]) {
+            case "bb1302":
+                newCapture.code = "bb1302";
+                break;
+            case "zxflux":
+                newCapture.code = "zxflux";
+                break;
+            case "c77124":
+                newCapture.code = "c77124";
+                break;
+            case "ba8278":
+                newCapture.code = "ba8278";
+                break;
+            case "bb0008":
+                newCapture.code = "bb0008";
+                break;
+            case "bb5477":
+                newCapture.code = "bb5477";
+                break;
+            case "boost":
+                newCapture.code = "boost";
+                break;
+            case "adidas":
+                newCapture.code = "adidas";
+                break;
+            case "invalid":
+                newCapture.code = "invalid";
+                break;
+            default:
+                break;
+        }
+        if (newCapture.code == "invalid") {
+            sendTextMessage(senderID, "I don't know about this...");
+        } else {
+            newCapture.id = senderID;
+            newCapture.name = userName;
+            newCapture.score = parseFloat(arr[3].replace(')', ''));
+            newCapture.save(function (err, data) {
+                if (err) {
+                    console.log(err);
+                }
+                console.log(newCapture);
+                shoe.findOne({'code': newCapture.code}, function (err, data) {
+                    if (err) {
+                        //Error servidor
+                        response = {"error": true, "message": "Fetching error"};
+                        res.status(500).json(response);
+                    } else {
+                        var randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
+                        var response = randBegin + "\"" + data.name + "\"" + ". " + data.description
+                            + ". You have them for " + data.price + "$ at adidas.com";
+                        sendTextMessage(senderID, response);
+                    }
+                })
+            });
+            console.log(stdout);
+        }
+    });
 }
 
 function sendGenericMessage(recipientId, messageText) {
@@ -358,6 +433,16 @@ function sendLoading(senderID){
         json: {"recipient": {"id": senderID},
             "sender_action":"typing_on"}
     });
+}
+
+function isUrl(url){
+    var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+    var regex = new RegExp(expression);
+    if (url.match(regex)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 module.exports = router;
