@@ -119,6 +119,9 @@ function receivedMessage(event) {
                                     console.log("Sí es un saludo");
                                     sendTextMessage(senderID, INTENTS[intent.slug]());
                                     break;
+                                case 'image':
+                                    sendTextMessage(senderID, "Insert a photo or a photo in an url containing Adidas trainers to recognize which model are they");
+                                    break;
                                 case 'askformodel':
                                     console.log('Está pidiendo info de un modelo');
                                     sendCardMessage(senderID);
@@ -129,7 +132,7 @@ function receivedMessage(event) {
                                     break;
                                 default:
                                     console.log("No es un saludo");
-                                    sendTextMessage(senderID, "gilipollas");
+                                    sendTextMessage(senderID, "I'm sorry, I didn't understand what you said. Maybe you are speaking in another language? I only know English :(");
                                     break;
                             }
                         } else {
@@ -403,33 +406,11 @@ function showHelpOptions(recipientId){
     callSendAPI(messageData);
 }
 
-function sendCardMessage(recipientId/*, trainer*/){
+function sendCardMessage(recipientId, trainer){
     let messageData = {
         recipient: {
             id: recipientId
         },
-        message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "generic",
-                    elements: [{
-                        title: "ZAPATILLA X_PLR",
-                        item_url: "http://www.adidas.es/zapatilla-x_plr/BB1100.html?pr=home_rr&slot=2",
-                        image_url: "http://www.adidas.es/dis/dw/image/v2/aagl_prd/on/demandware.static/-/Sites-adidas-products/default/dw4863d725/zoom/BB1100_01_standard.jpg?sw=500&sfrm=jpg",
-                        buttons: [{
-                            type: "web_url",
-                            url: "http://www.adidas.es/zapatilla-x_plr/BB1100.html?pr=home_rr&slot=2",
-                            title: "Go to shop"
-                        }, {
-                            type: "postback",
-                            title: "Show more info",
-                            payload: '{ "payloadName": "show_info", "body": { "name": "Zapatilla x_plr", "text": "jajajaja xddd" }}'
-                        }],
-                    }]
-                }
-            }
-        }/*
         message: {
             attachment: {
                 type: "template",
@@ -446,26 +427,12 @@ function sendCardMessage(recipientId/*, trainer*/){
                         }, {
                             type: "postback",
                             title: "Show more info",
-                            payload: "Show more info",
+                            payload: '{ "payloadName": "show_info", "body": { "code": "' + trainer.code + '"}}'
                         }],
-                    }, {
-                        title: "touch",
-                        subtitle: "Your Hands, Now in VR",
-                        item_url: "https://www.oculus.com/en-us/touch/",
-                        image_url: "http://messengerdemo.parseapp.com/img/touch.png",
-                        buttons: [{
-                            type: "web_url",
-                            url: trainer.itemUrl,
-                            title: "Open Web URL"
-                        }, {
-                            type: "postback",
-                            title: "Call Postback",
-                            payload: "Payload for second bubble",
-                        }]
                     }]
                 }
             }
-        }*/
+        }
     };
 
     callSendAPI(messageData);
