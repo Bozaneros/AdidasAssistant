@@ -161,8 +161,6 @@ function processAttachment(senderID, messageAttachments, userName){
                 imageUrl = imageUrl.replace("https://l.facebook.com/l.php?u=", "");
                 imageUrl = decodeURIComponent(imageUrl);
             case "image":
-                sendTextMessage(senderID, INTENTS['askforinfo']());
-                sendLoading(senderID);
                 var exec = require('child_process').exec;
 
                 var cmd = 'python ../main.py ' + "\"" + imageUrl + "\"";
