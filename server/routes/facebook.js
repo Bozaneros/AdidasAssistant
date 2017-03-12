@@ -27,7 +27,7 @@ const INTENTS = {
 let randomBegin = ["It appears to be ", "Oh! These are ", "I'm so confident these are ", "Ok, I have found that these are ",
     "Wait a moment! These are the new "];
 
-let randomEnd = [""];
+let randomEnd = ["Ok Bye! :)", "Bye bye.", "See you", "See you soon", "Thank you. Bye!"];
 
 router.get('', function(req, res) {
     if (req.query['hub.mode'] === 'subscribe' &&
@@ -110,7 +110,6 @@ function receivedMessage(event) {
                 processUrl(senderID, messageText, userName);
             } else if (messageText) {
                 processText(senderID, messageText, userName);
-
             } else {
                 console.error("Unable to find user");
 
@@ -160,6 +159,9 @@ function processText(senderID, messageText, userName){
                         console.log("Está pidiendo ayuda");
                         showHelpOptions(senderID);
                         break;
+                    case 'goodbyes':
+                        console.log("Esta despidiendose");
+                        sendTextMessage(senderID, randomEnd[Math.floor(Math.random() * randomEnd.length)]);
                     default:
                         console.log("No es un saludo");
                         sendTextMessage(senderID, "I'm sorry, I didn't understand what you said. Maybe you are speaking in another language? I only know English :(");
