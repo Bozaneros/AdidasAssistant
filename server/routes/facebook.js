@@ -104,9 +104,7 @@ function receivedMessage(event) {
             let messageText = message.text;
             let messageAttachments = message.attachments;
 
-            if (isUrl(messageText)) {
-                processUrl(senderID, messageText, userName);
-            } else if(messageAttachments){
+            if (messageAttachments) {
                 processAttachment(senderID, messageAttachments, userName);
             } else if (messageText) {
                 processText(senderID, messageText, userName);
@@ -332,103 +330,6 @@ function processAttachment(senderID, messageAttachments, userName){
         }
     });
 
-}
-
-function processUrl(senderID, messageAttachments, userName){
-    console.log(messageAttachments);
-    let exec = require('child_process').exec;
-
-    let cmd = 'python main.py ' + "\"" + messageAttachments + "\"";
-    let newCapture = new capture();
-    exec(cmd, function (error, stdout, stderr) {
-        console.log("Error" + error);
-        console.log("Stdout: " + stdout);
-        let firstLine = stdout.split('\n')[0];
-        console.log("First Line: " + firstLine);
-        let arr = firstLine.split(" ");
-        console.log("Arr: " + arr);
-        switch (arr[0]) {
-            case "bb1302":
-                newCapture.code = "bb1302";
-                break;
-            case "zxflux":
-                newCapture.code = "zxflux";
-                break;
-            case "c77124":
-                newCapture.code = "c77124";
-                break;
-            case "ba8278":
-                newCapture.code = "ba8278";
-                break;
-            case "bb0008":
-                newCapture.code = "bb0008";
-                break;
-            case "bb5477":
-                newCapture.code = "bb5477";
-                break;
-            case "boost":
-                newCapture.code = "boost";
-                break;
-            case "adidas":
-                newCapture.code = "adidas";
-                break;
-            case "invalid":
-                newCapture.code = "invalid";
-                break;
-            default:
-                break;
-        }
-        if (newCapture.code == "invalid") {
-            sendTextMessage(senderID, "I don't know about this...");
-        } else {
-            newCapture.id = senderID;
-            newCapture.name = userName;
-            newCapture.score = parseFloat(arr[3].replace(')', ''));
-            newCapture.save(function (err, data) {
-                if (err) {
-                    console.log(err);
-                }
-                console.log(newCapture);
-
-                // Makes HTTP request to API (GET)
-                /*
-                request({
-                    uri: "https://bozaneros.ddns.net/api/shoe/" + newCapture.code,
-                    method: "GET",
-                    timeout: 10000
-                }, function(error, data) {
-                    if (err) {
-                        //Error servidor
-                        response = {"error": true, "message": "Fetching error"};
-                        res.status(500).json(response);
-                    } else {
-                        let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
-                        let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
-                            + ". You have them for " + data.price + "$ at adidas.com";
-                        sendTextMessage(senderID, response);
-                    }
-                });
-                */
-
-
-                shoe.findOne({'code': newCapture.code}, function (err, data) {
-                    if (err) {
-                        //Error servidor
-                        response = {"error": true, "message": "Fetching error"};
-                        res.status(500).json(response);
-                    } else {
-
-                        sendCardMessage(senderID, data);
-                      /*  let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
-                        let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
-                            + ". You have them for " + data.price + "$ at adidas.com";
-                        sendTextMessage(senderID, response);*/
-                    }
-                })
-            });
-            console.log(stdout);
-        }
-    });
 }
 
 function sendGenericMessage(recipientId, messageText) {
