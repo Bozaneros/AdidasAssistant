@@ -439,6 +439,7 @@ function managePostBack(event){
     let senderID = event.sender.id;
     let recipientID = event.recipient.id;
     let timeOfPostback = event.timestamp;
+    let threshold = 0.1;
 
     // The 'payload' param is a developer-defined field which is set in a postback
     // button for Structured Messages.
