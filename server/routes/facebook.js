@@ -172,7 +172,7 @@ function processAttachment(senderID, messageAttachments, userName){
             case "image":
                 let exec = require('child_process').exec;
 
-                let cmd = 'python ../main.py ' + "\"" + imageUrl + "\"";
+                let cmd = 'python main.py ' + "\"" + imageUrl + "\"";
                 let newCapture = new capture();
                 exec(cmd, function (error, stdout, stderr) {
                     console.log("Error" + error);
@@ -289,7 +289,7 @@ function processAttachment(senderID, messageAttachments, userName){
             case "audio":
                 let execAudio = require('child_process').exec;
 
-                let cmdAudio = 'python ../speech.py ' + "\"" + attachment.payload.url + "\"";
+                let cmdAudio = 'python speech.py ' + "\"" + attachment.payload.url + "\"";
                 execAudio(cmdAudio, function (error, stdout, stderr) {
                     console.log("Error" + error);
                     console.log("Stdout: " + stdout);
@@ -309,7 +309,7 @@ function processUrl(senderID, messageAttachments, userName){
     console.log(messageAttachments);
     let exec = require('child_process').exec;
 
-    let cmd = 'python ../main.py ' + "\"" + messageAttachments + "\"";
+    let cmd = 'python main.py ' + "\"" + messageAttachments + "\"";
     let newCapture = new capture();
     exec(cmd, function (error, stdout, stderr) {
         console.log("Error" + error);
