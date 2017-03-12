@@ -241,10 +241,9 @@ function processAttachment(senderID, messageAttachments, userName){
                     minprice: 1,
                     maxprice: 4,
                     type: 'shop'
-                }).then(function(response) {
+                }, function(response) {
                     console.log(response.json.results);
-                })
-                    .then(done, fail);
+                });
                 sendTextMessage(senderID, "I don't know about this...");
                 break;
             default:
