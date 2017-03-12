@@ -600,6 +600,9 @@ function sendHistory(senderID){
                 });
             });
 
+            console.log("==================================================");
+            console.log(elements);
+            console.log("==================================================");
             let messageData = {
                 recipient: {
                     id: senderID
