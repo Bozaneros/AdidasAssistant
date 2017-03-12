@@ -149,7 +149,6 @@ function processText(senderID, messageText, userName){
                                 }
 
                                 sendCardMessage(senderID, entity);
-                                break;
                             })
                         }
                         else {
@@ -162,9 +161,10 @@ function processText(senderID, messageText, userName){
                             context.findOneAndUpdate(query, update, options, function(err, data) {
                                 if (err) return;
                                 else entity = data.lastEntity;
-                                break;
                             });
                         }
+
+                        break;
                     case 'help':
                         console.log("Está pidiendo ayuda");
                         showHelpOptions(senderID);
