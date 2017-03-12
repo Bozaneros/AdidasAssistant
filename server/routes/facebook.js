@@ -567,7 +567,7 @@ function isUrl(url){
 }
 
 function sendHistory(senderID){
-    capture.find({id: senderID}).sort({'submittedDate': 'desc'}, function(err, data){
+    capture.find({id: senderID}).sort({'submittedDate': 'desc'}).exec(function(err, data){
         if(err){
             sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
         } else{
