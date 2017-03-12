@@ -384,6 +384,7 @@ function processUrl(senderID, messageAttachments, userName){
             newCapture.id = senderID;
             newCapture.name = userName;
             newCapture.score = parseFloat(arr[3].replace(')', ''));
+            newCapture.date = Date.now();
             newCapture.save(function (err, data) {
                 if (err) {
                     console.log(err);
