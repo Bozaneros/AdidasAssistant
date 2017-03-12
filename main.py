@@ -40,10 +40,24 @@ import requests
 import time
 import mimetypes
 from PIL import Image
+import urllib.request as urllib2
 
 imagePath = ''
 modelFullPath = 'graph.pb'
 labelsFullPath = 'labels.txt'
+
+
+class HeadRequest(urllib2.Request):
+    def get_method(self):
+        return 'HEAD'
+
+def isImageUrl(url):
+    response= urllib2.urlopen(HeadRequest(url))
+    maintype= response.headers['Content-Type'].split(';')[0].lower()
+    if maintype not in ('image/png', 'image/jpeg', 'image/gif'):
+        return False
+    else:
+        return True
 
 
 def create_graph():
@@ -87,30 +101,37 @@ def run_inference_on_image():
         return answer
 
 def download_from_url(url):
-    t0 = time.clock()
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-    response = requests.get(url, headers=headers, stream=True)
-    content_type = response.headers['content-type']
-    extension = mimetypes.guess_extension(content_type)
-    global imagePath
-    imagePath = str(t0) + extension
-    with open(imagePath, 'wb') as handle:
+    if(not isImageUrl(url)):
+        return False
+    else:
+        t0 = time.clock()
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+        response = requests.get(url, headers=headers, stream=True)
+        content_type = response.headers['content-type']
+        extension = mimetypes.guess_extension(content_type)
+        global imagePath
+        imagePath = str(t0) + extension
+        with open(imagePath, 'wb') as handle:
 
-        if not response.ok:
-            print(response)
+            if not response.ok:
+                print(response)
 
-        for block in response.iter_content(1024):
-            if not block:
-                break
+            for block in response.iter_content(1024):
+                if not block:
+                    break
 
-            handle.write(block)
-    img = Image.open(imagePath)
-    imagePath = imagePath.replace(extension, '.jpg')
-    img.save(imagePath)
+                handle.write(block)
+        img = Image.open(imagePath)
+        imagePath = imagePath.replace(extension, '.jpg')
+        img.save(imagePath)
+        return True
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
         url = str(sys.argv[1])
-        download_from_url(url)
-        print(run_inference_on_image())
+        if(download_from_url(url)):
+            print(run_inference_on_image())
+        else:
+            print("invalid (score = 1.0)")
+
