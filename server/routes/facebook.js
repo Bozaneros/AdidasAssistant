@@ -246,14 +246,13 @@ function processAttachment(senderID, messageAttachments, userName){
                 }, function(err, response) {
                     console.log(response.json.results);
                     var locations = response.json.results;
-                    locations.forEach(function(entry) {
-                        var rawPlacesUrl = "https://www.google.es/maps/place/";
-                        var placesUrl = rawPlacesUrl + encodeURIComponent(entry.formatted_address);
-                        var textResponse = "Your nearest Adidas shop is at the following direction: \"" +
-                                entry.formatted_address + "\". You can view it in Google Maps by clicking in the link: " +
-                                placesUrl;
-                        sendTextMessage(senderID, textResponse);
-                    });
+                    var entry = locations[0];
+                    var rawPlacesUrl = "https://www.google.es/maps/place/";
+                    var placesUrl = rawPlacesUrl + encodeURIComponent(entry.formatted_address);
+                    var textResponse = "Your nearest Adidas shop is at the following direction: \"" +
+                            entry.formatted_address + "\". You can view it in Google Maps by clicking in the link: " +
+                            placesUrl;
+                    sendTextMessage(senderID, textResponse);
                 });
                 break;
             default:
