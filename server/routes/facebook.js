@@ -571,8 +571,50 @@ function sendHistory(senderID){
         if(err){
             sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
         } else{
-            console.log(data);
-            data.slice(0,1,2);
+            if(data.length > 3){
+                data = data.slice(0,1,2);
+            }
+
+            var elements = [];
+            data.forEach(function(capture) {
+                shoe.find({code: capture.code}, function(err, res){
+                    if(err){
+                        console.log("ERROR");
+                    } else{
+                        let element = {
+                            title: res.name,
+                            item_url: res.itemUrl,
+                            image_url: res.imageUrl,
+                            buttons: [{
+                                type: "web_url",
+                                url: res.itemUrl,
+                                title: "Go to shop"
+                            }, {
+                                type: "postback",
+                                title: "Show more info",
+                                payload: '{ "payloadName": "show_info", "body": { "code": "' + res.code + '"}}'
+                            }],
+                        };
+                        elements.push(element);
+                    }
+                });
+            });
+
+            let messageData = {
+                recipient: {
+                    id: recipientId
+                },
+                message: {
+                    attachment: {
+                        type: "template",
+                        payload: {
+                            template_type: "generic",
+                            elements: elements
+                        }
+                    }
+                }
+            };
+            callSendAPI(messageData);
         }
     });
 }
