@@ -602,7 +602,7 @@ function sendHistory(senderID){
 
             let messageData = {
                 recipient: {
-                    id: recipientId
+                    id: senderID
                 },
                 message: {
                     attachment: {
