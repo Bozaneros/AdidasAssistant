@@ -571,11 +571,16 @@ function sendHistory(senderID){
         if(err){
             sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
         } else{
+
+            console.log(data);
+
             if(data.length > 3){
                 data = data.slice(0,1,2);
             }
 
-            var elements = [];
+            console.log(data);
+
+            let elements = [];
             data.forEach(function(capture) {
                 console.log("===================================> " + capture.code);
                 shoe.findOne({'code': capture.code}, function(err, res){
