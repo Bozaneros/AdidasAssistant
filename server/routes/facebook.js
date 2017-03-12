@@ -162,6 +162,7 @@ function processText(senderID, messageText, userName){
                     case 'goodbyes':
                         console.log("Esta despidiendose");
                         sendTextMessage(senderID, randomEnd[Math.floor(Math.random() * randomEnd.length)]);
+                        break;
                     default:
                         console.log("No es un saludo");
                         sendTextMessage(senderID, "I'm sorry, I didn't understand what you said. Maybe you are speaking in another language? I only know English :(");
