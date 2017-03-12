@@ -104,10 +104,10 @@ function receivedMessage(event) {
             let messageText = message.text;
             let messageAttachments = message.attachments;
 
-            if (messageAttachments) {
-                processAttachment(senderID, messageAttachments, userName);
-            } else if(isUrl(messageText)){
+            if (isUrl(messageText)) {
                 processUrl(senderID, messageText, userName);
+            } else if(messageAttachments){
+                processAttachment(senderID, messageAttachments, userName);
             } else if (messageText) {
                 processText(senderID, messageText, userName);
 
