@@ -434,12 +434,14 @@ function managePostBack(event){
             break;
     }
 
-    console.log("Received postback for user %d and page %d with payload '%s' " +
-        "at %d", senderID, recipientID, payload, timeOfPostback);
+
+
+    //console.log("Received postback for user %d and page %d with payload '%s' " +
+    //    "at %d", senderID, recipientID, payload, timeOfPostback);
 
     // When a postback is called, we'll send a message back to the sender to
     // let them know it was successful
-    sendTextMessage(senderID, JSON.parse(event.postback.payload).body.text);
+    //sendTextMessage(senderID, JSON.parse(event.postback.payload).body.text);
 }
 
 function showHelpOptions(recipientId){
@@ -571,16 +573,19 @@ function sendHistory(senderID){
         if(err){
             sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
         } else{
-
             console.log(data);
 
+
+            let max = data.length;
             if(data.length > 3){
-                data = data.slice(0,1,2);
+                data = data.slice(0,2);
+                max = 3;
             }
 
-            console.log(data);
 
+            console.log(data);
             let elements = [];
+            let wait = 0;
             data.forEach(function(capture) {
                 console.log("===================================> " + capture.code);
                 shoe.findOne({'code': capture.code}, function(err, res){
@@ -602,10 +607,12 @@ function sendHistory(senderID){
                             }],
                         };
                         elements.push(element);
+                        wait = wait + 1;
                     }
                 });
             });
 
+            while(wait != max){}
             console.log("==================================================");
             console.log(elements);
             console.log("==================================================");
