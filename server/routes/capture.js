@@ -75,7 +75,7 @@ router.delete('/capture/:id', (req, res) => {
 
   var response = {};
   var id = req.params.id;
-  capture.delete({id: id}, function(err, data){
+  capture.remove({id: id}, function(err, data){
     if(err){
       response = {"error": true, "message": "No se pudo eliminar"};
       res.status(403).json(response);
@@ -91,7 +91,7 @@ router.delete('/capture', (req, res) => {
 
     var response = {};
 
-    capture.delete({}, function(err, data){
+    capture.remove({}, function(err, data){
         if(err){
             response = {"error": true, "message": "No se pudo eliminar"};
             res.status(403).json(response);
