@@ -455,7 +455,7 @@ function managePostBack(event){
             break;
         case "recognize":
             console.log("Quiere reconocer imagen");
-            sendTextMessage(senderID, "Insert a photo or a link photo containing Adidas trainers to recognize which model are they");
+            sendTextMessage(senderID, "Insert a photo or a link to a photo containing Adidas trainers to recognize which model they are");
             break;
         case "history":
             console.log("Quiere mostrar el historial");
