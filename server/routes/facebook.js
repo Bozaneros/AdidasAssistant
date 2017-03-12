@@ -238,8 +238,6 @@ function processAttachment(senderID, messageAttachments, userName){
                     language: 'en',
                     location: [attachment.payload.coordinates.lat, attachment.payload.coordinates.long],
                     rankby: 'distance',
-                    minprice: 1,
-                    maxprice: 4,
                     type: 'shop'
                 }, function(err, response) {
                     console.log(response.json.results);
