@@ -278,12 +278,12 @@ function processAttachment(senderID, messageAttachments, userName){
                                 res.status(500).json(response);
                             } else {
                                 if(newCapture.score < threshold){
-
+                                    sendTextMessage(senderID, "Sorry... I don't know what product is...");
                                 } else {
                                     sendCardMessage(senderID, data);
                                 }
                             }
-                        })
+                        });
                     });
                     console.log(stdout);
                     console.log(stderr);
@@ -444,8 +444,21 @@ function managePostBack(event){
     switch(JSON.parse(payload).payloadName){
         case "show_info":
             console.log("Mostrando info producto");
-            //TODO: enviar mensaje con el cuerpo del producto
-
+            capture.findOne({}, {}, { sort: { 'created_at' : -1 } }, function(err, cap) {
+                shoe.findOne({'code': cap.code}, function (err, data) {
+                    if (err) {
+                        //Error servidor
+                        response = {"error": true, "message": "Fetching error"};
+                        res.status(500).json(response);
+                    } else {
+                        if(newCapture.score < threshold){
+                            sendTextMessage(senderID, "Sorry... I don't know what product is...");
+                        } else {
+                            sendCardMessage(senderID, data);
+                        }
+                    }
+                });
+            });
             break;
         case "recognize":
             console.log("Quiere reconocer imagen");
