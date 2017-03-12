@@ -105,7 +105,7 @@ def download_from_url(url):
         return False
     else:
         t0 = time.clock()
-        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'}
         response = requests.get(url, headers=headers, stream=True)
         content_type = response.headers['content-type']
         extension = mimetypes.guess_extension(content_type)
