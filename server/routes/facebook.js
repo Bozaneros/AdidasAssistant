@@ -603,7 +603,7 @@ function sendHistory(senderID){
             console.log(data.length);
 
 
-            let max = data.length;
+            var max = data.length;
             if(data.length > 3){
                 data = data.slice(0,3);
                 max = 3;
@@ -611,15 +611,15 @@ function sendHistory(senderID){
 
 
             console.log(data.length);
-            let elements = [];
-            let wait = 0;
+            var elements = [];
+            var wait = 0;
             data.forEach(function(capture) {
                 console.log("===================================> " + capture.code);
                 shoe.findOne({'code': capture.code}, function(err, res){
                     if(err){
                         console.log("ERROR");
                     } else{
-                        let element = {
+                        var element = {
                             title: res.name,
                             item_url: res.itemUrl,
                             image_url: res.imageUrl,
