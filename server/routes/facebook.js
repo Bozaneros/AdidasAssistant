@@ -151,7 +151,7 @@ function processAttachment(senderID, messageAttachments, userName){
     console.log(messageAttachments);
 
     // Iterate over each entry - there may be multiple if batched
-
+    var threshold = 0.1;
     messageAttachments.forEach(function(attachment) {
         var imageUrl = attachment.url || attachment.payload.url;
         switch (attachment.type) {
@@ -213,10 +213,14 @@ function processAttachment(senderID, messageAttachments, userName){
                                 response = {"error": true, "message": "Fetching error"};
                                 res.status(500).json(response);
                             } else {
-                                var randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
-                                var response = randBegin + "\"" + data.name + "\"" + ". " + data.description
-                                    + ". You have them for " + data.price + "$ at adidas.com";
-                                sendTextMessage(senderID, response);
+                                if(score < threshold){
+
+                                } else {
+                                    var randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
+                                    var response = randBegin + "\"" + data.name + "\"" + ". " + data.description
+                                        + ". You have them for " + data.price + "$ at adidas.com";
+                                    sendTextMessage(senderID, response);
+                                }
                             }
                         })
                     });
