@@ -11,7 +11,7 @@ const util = require('util');
 
 let capture = require('../models/capture');
 let shoe = require('../models/shoe');
-
+let context = require('../models/userContext');
 
 const getGreetings = require('../intents/greetings');
 const getAskForModel= require('../intents/askformodel');
@@ -109,46 +109,80 @@ function receivedMessage(event) {
             } else if(isUrl(messageText)){
                 processUrl(senderID, messageText, userName);
             } else if (messageText) {
+                processText(senderID, messageText, userName);
 
-                recastClient.textRequest(messageText)
-                    .then(res => {
-                        const intent = res.intent();
-                        if (intent != null) {
-                            switch (intent.slug) {
-                                case 'greetings':
-                                    console.log("Sí es un saludo");
-                                    sendTextMessage(senderID, INTENTS[intent.slug]());
-                                    break;
-                                case 'image':
-                                    sendTextMessage(senderID, "Insert a photo or a photo in an url containing Adidas trainers to recognize which model are they");
-                                    break;
-                                case 'askformodel':
-                                    console.log('Está pidiendo info de un modelo');
-                                    sendCardMessage(senderID);
-                                    break;
-                                case 'help':
-                                    console.log("Está pidiendo ayuda");
-                                    showHelpOptions(senderID);
-                                    break;
-                                default:
-                                    console.log("No es un saludo");
-                                    sendTextMessage(senderID, "I'm sorry, I didn't understand what you said. Maybe you are speaking in another language? I only know English :(");
-                                    break;
-                            }
-                        } else {
-                            console.log("No es un saludo");
-                            sendTextMessage(senderID, "What? I don't get it...");
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        sendTextMessage(senderID, 'I need some sleep right now... Talk to me later!');
-                    });
+            } else {
+                console.error("Unable to find user");
+
             }
-        } else {
-            console.error("Unable to find user");
         }
     });
+}
+
+
+function processText(senderID, messageText, userName){
+    recastClient.textRequest(messageText)
+        .then(res => {
+            const intent = res.intent();
+            if (intent != null) {
+                switch (intent.slug) {
+                    case 'greetings':
+                        console.log("Sí es un saludo");
+                        sendTextMessage(senderID, INTENTS[intent.slug]());
+                        break;
+                    case 'image':
+                        sendTextMessage(senderID, "Insert a photo or a photo in an url containing Adidas trainers to recognize which model are they");
+                        break;
+                    case 'askformodel':
+                        console.log('Está pidiendo info de un modelo');
+                        let entity = res.get('trainers');
+
+                        // Tries to recover the context of the conversation
+                        if (!entity) {
+                            context.findOne({'user': userName}, function (err, data) {
+                                if (err) {
+                                    //Error servidor
+                                    response = {"error": true, "message": "Fetching error"};
+                                    res.status(500).json(response);
+                                } else {
+                                    entity = data.lastEntity;
+                                }
+
+                                sendCardMessage(senderID, entity);
+                            })
+                        }
+                        else {
+
+                            // Updates the last entity provided by the user
+                            var query = {},
+                                update = { lastEntity: entity },
+                                options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+                            context.findOneAndUpdate(query, update, options, function(err, data) {
+                                if (err) return;
+                                else entity = data.lastEntity;
+                            });
+                        }
+
+                        break;
+                    case 'help':
+                        console.log("Está pidiendo ayuda");
+                        showHelpOptions(senderID);
+                        break;
+                    default:
+                        console.log("No es un saludo");
+                        sendTextMessage(senderID, "I'm sorry, I didn't understand what you said. Maybe you are speaking in another language? I only know English :(");
+                        break;
+                }
+            } else {
+                console.log("No es un saludo");
+                sendTextMessage(senderID, "What? I don't get it...");
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            sendTextMessage(senderID, 'I need some sleep right now... Talk to me later!');
+        });
 }
 
 function processAttachment(senderID, messageAttachments, userName){
@@ -166,7 +200,7 @@ function processAttachment(senderID, messageAttachments, userName){
             case "image":
                 let exec = require('child_process').exec;
 
-                let cmd = 'python ../main.py ' + "\"" + imageUrl + "\"";
+                let cmd = 'python main.py ' + "\"" + imageUrl + "\"";
                 let newCapture = new capture();
                 exec(cmd, function (error, stdout, stderr) {
                     console.log("Error" + error);
@@ -206,6 +240,7 @@ function processAttachment(senderID, messageAttachments, userName){
                     newCapture.id = senderID;
                     newCapture.name = userName;
                     newCapture.score = parseFloat(arr[3].replace(')', ''));
+                    newCapture.date = Date.now();
                     newCapture.save(function (err, data) {
                         if (err) {
                             console.log(err);
@@ -280,6 +315,17 @@ function processAttachment(senderID, messageAttachments, userName){
                     sendTextMessage(senderID, textResponse);
                 });
                 break;
+            case "audio":
+                let execAudio = require('child_process').exec;
+
+                let cmdAudio = 'python speech.py ' + "\"" + attachment.payload.url + "\"";
+                execAudio(cmdAudio, function (error, stdout, stderr) {
+                    console.log("Error" + error);
+                    console.log("Stdout: " + stdout);
+                    processText(senderID, stdout);
+                });
+
+                break;
             default:
                 sendTextMessage(senderID, "I don't know about this...");
                 break;
@@ -292,7 +338,7 @@ function processUrl(senderID, messageAttachments, userName){
     console.log(messageAttachments);
     let exec = require('child_process').exec;
 
-    let cmd = 'python ../main.py ' + "\"" + messageAttachments + "\"";
+    let cmd = 'python main.py ' + "\"" + messageAttachments + "\"";
     let newCapture = new capture();
     exec(cmd, function (error, stdout, stderr) {
         console.log("Error" + error);
@@ -407,7 +453,6 @@ function managePostBack(event){
             break;
         case "history":
             console.log("Quiere mostrar el historial");
-            //TODO historial
             sendHistory(senderID);
             break;
         case "shops":
@@ -416,12 +461,14 @@ function managePostBack(event){
             break;
     }
 
-    console.log("Received postback for user %d and page %d with payload '%s' " +
-        "at %d", senderID, recipientID, payload, timeOfPostback);
+
+
+    //console.log("Received postback for user %d and page %d with payload '%s' " +
+    //    "at %d", senderID, recipientID, payload, timeOfPostback);
 
     // When a postback is called, we'll send a message back to the sender to
     // let them know it was successful
-    sendTextMessage(senderID, JSON.parse(event.postback.payload).body.text);
+    //sendTextMessage(senderID, JSON.parse(event.postback.payload).body.text);
 }
 
 function showHelpOptions(recipientId){
@@ -549,7 +596,71 @@ function isUrl(url){
 }
 
 function sendHistory(senderID){
+    capture.find({id: senderID}).sort({'submittedDate': 'desc'}).exec(function(err, data){
+        if(err){
+            sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
+        } else{
+            console.log(data.length);
 
+
+            let max = data.length;
+            if(data.length > 3){
+                data = data.slice(0,3);
+                max = 3;
+            }
+
+
+            console.log(data.length);
+            let elements = [];
+            let wait = 0;
+            data.forEach(function(capture) {
+                console.log("===================================> " + capture.code);
+                shoe.findOne({'code': capture.code}, function(err, res){
+                    if(err){
+                        console.log("ERROR");
+                    } else{
+                        let element = {
+                            title: res.name,
+                            item_url: res.itemUrl,
+                            image_url: res.imageUrl,
+                            buttons: [{
+                                type: "web_url",
+                                url: res.itemUrl,
+                                title: "Go to shop"
+                            }, {
+                                type: "postback",
+                                title: "Show more info",
+                                payload: '{ "payloadName": "show_info", "body": { "code": "' + res.code + '"}}'
+                            }],
+                        };
+                        elements.push(element);
+
+                    }
+                    wait = wait + 1;
+                });
+            });
+
+            while(wait != max){}
+            console.log("==================================================");
+            console.log(elements);
+            console.log("==================================================");
+            let messageData = {
+                recipient: {
+                    id: senderID
+                },
+                message: {
+                    attachment: {
+                        type: "template",
+                        payload: {
+                            template_type: "generic",
+                            elements: elements
+                        }
+                    }
+                }
+            };
+            callSendAPI(messageData);
+        }
+    });
 }
 
 module.exports = router;
