@@ -137,7 +137,7 @@ function receivedMessage(event) {
                             }
                         } else {
                             console.log("No es un saludo");
-                            sendTextMessage(senderID, "gilipollas");
+                            sendTextMessage(senderID, "What? I don't get it...");
                         }
                     })
                     .catch((err) => {
