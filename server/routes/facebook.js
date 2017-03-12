@@ -572,7 +572,7 @@ function sendHistory(senderID){
             sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
         } else{
             console.log(data);
-            data.take(3);
+            data.slice(0,1,2);
         }
     });
 }
