@@ -133,5 +133,5 @@ if __name__ == '__main__':
         if(download_from_url(url)):
             print(run_inference_on_image())
         else:
-            print("")
+            print("invalid (score = 1.0)")
 
