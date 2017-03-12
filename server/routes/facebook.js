@@ -135,7 +135,8 @@ function processText(senderID, messageText){
                         break;
                     case 'askformodel':
                         console.log('Está pidiendo info de un modelo');
-                        sendCardMessage(senderID);
+                        //TODO: Sacar aquí la entidad que vienen en la consulta. Si no hay entidad => se asume la de la base de datos
+                        sendCardMessage(senderID /*, TODO */);
                         break;
                     case 'help':
                         console.log("Está pidiendo ayuda");
@@ -424,7 +425,6 @@ function managePostBack(event){
             break;
         case "history":
             console.log("Quiere mostrar el historial");
-            //TODO historial
             sendHistory(senderID);
             break;
         case "shops":
@@ -509,42 +509,6 @@ function sendCardMessage(recipientId, trainer){
     callSendAPI(messageData);
 }
 
-function showCaptureOptions(recipientId){
-    let messageData = {
-        recipient: {
-            id: recipientId
-        },
-        message: {
-            attachment: {
-                type: "template",
-                payload: {
-                    template_type: "generic",
-                    elements: [{
-                        title: "This are the options you can do:",
-                        subtitle: "",
-                        buttons: [{
-                            type: "postback",
-                            title: "Recognize trainers",
-                            payload: '{ "payloadName": "recognize", "body": {}}'
-
-                        }, {
-                            type: "postback",
-                            title: "Show my history",
-                            payload: '{ "payloadName": "history", "body": {}}'
-                        }, {
-                            type: "postback",
-                            title: "Show closest shop",
-                            payload: '{ "payloadName": "shops", "body": {}}'
-                        }],
-                    }]
-                }
-            }
-        }
-    };
-
-    callSendAPI(messageData);
-}
-
 function sendTextMessage(recipientId, messageText) {
     console.log(messageText);
     let messageData = {
@@ -602,7 +566,14 @@ function isUrl(url){
 }
 
 function sendHistory(senderID){
-
+    capture.find({id: senderID}).sort({'submittedDate': 'desc'}, function(err, data){
+        if(err){
+            sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
+        } else{
+            console.log(data);
+            data.take(3);
+        }
+    });
 }
 
 module.exports = router;

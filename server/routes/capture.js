@@ -32,6 +32,7 @@ router.post('/capture', (req, res) => {
   newCapture.name = req.body.name;
   newCapture.code = req.body.code;
   newCapture.score = req.body.score;
+  newCapture.date = Date.now();
 
 
     capture.findOne({id: newCapture.id}, function(err, data){
