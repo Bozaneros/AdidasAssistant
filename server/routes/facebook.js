@@ -147,7 +147,7 @@ function processText(senderID, messageText, userName){
                                     response = {"error": true, "message": "Fetching error"};
                                     res.status(500).json(response);
                                 } else {
-                                    if(cap.score < threshold){
+                                    if(cap.score < 0.01){
                                         sendTextMessage(senderID, "Sorry... I don't know what product is...");
                                     } else {
                                         sendCardMessage(senderID, data);
