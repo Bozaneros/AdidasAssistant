@@ -241,7 +241,7 @@ function processAttachment(senderID, messageAttachments, userName){
                     minprice: 1,
                     maxprice: 4,
                     type: 'shop'
-                }, function(response) {
+                }, function(err, response) {
                     console.log(response.json.results);
                 });
                 sendTextMessage(senderID, "I don't know about this...");
