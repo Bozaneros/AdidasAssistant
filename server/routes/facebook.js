@@ -213,7 +213,7 @@ function processAttachment(senderID, messageAttachments, userName){
                                 response = {"error": true, "message": "Fetching error"};
                                 res.status(500).json(response);
                             } else {
-                                if(score < threshold){
+                                if(newCapture.score < threshold){
 
                                 } else {
                                     var randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
