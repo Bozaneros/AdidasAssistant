@@ -640,7 +640,7 @@ function sendHistory(senderID){
                 });
             });
 
-            while(wait != max){}
+            while(wait != max){console.log(wait + " - " + max)}
             console.log("==================================================");
             console.log(elements);
             console.log("==================================================");
