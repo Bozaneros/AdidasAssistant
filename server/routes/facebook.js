@@ -153,7 +153,7 @@ function processAttachment(senderID, messageAttachments, userName){
     // Iterate over each entry - there may be multiple if batched
 
     messageAttachments.forEach(function(attachment) {
-        var imageUrl = attachment.payload.url;
+        var imageUrl = attachment.url || attachment.payload.url;
         switch (attachment.type) {
             case "fallback":
                 imageUrl = attachment.url;
