@@ -11,7 +11,7 @@ const util = require('util');
 
 let capture = require('../models/capture');
 let shoe = require('../models/shoe');
-
+let context = require('../models/userContext');
 
 const getGreetings = require('../intents/greetings');
 const getAskForModel= require('../intents/askformodel');
@@ -109,7 +109,7 @@ function receivedMessage(event) {
             } else if(isUrl(messageText)){
                 processUrl(senderID, messageText, userName);
             } else if (messageText) {
-                processText(senderID, messageText);
+                processText(senderID, messageText, userName);
 
             } else {
                 console.error("Unable to find user");
@@ -120,7 +120,7 @@ function receivedMessage(event) {
 }
 
 
-function processText(senderID, messageText){
+function processText(senderID, messageText, userName){
     recastClient.textRequest(messageText)
         .then(res => {
             const intent = res.intent();
@@ -135,8 +135,35 @@ function processText(senderID, messageText){
                         break;
                     case 'askformodel':
                         console.log('Está pidiendo info de un modelo');
-                        sendCardMessage(senderID);
-                        break;
+                        let entity = res.get('trainers');
+
+                        // Tries to recover the context of the conversation
+                        if (!entity) {
+                            context.findOne({'user': userName}, function (err, data) {
+                                if (err) {
+                                    //Error servidor
+                                    response = {"error": true, "message": "Fetching error"};
+                                    res.status(500).json(response);
+                                } else {
+                                    entity = data.lastEntity;
+                                }
+
+                                sendCardMessage(senderID, entity);
+                                break;
+                            })
+                        }
+                        else {
+
+                            // Updates the last entity provided by the user
+                            var query = {},
+                                update = { lastEntity: entity },
+                                options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+                            context.findOneAndUpdate(query, update, options, function(err, data) {
+                                if (err) return;
+                                else entity = data.lastEntity;
+                            });
+                        }
                     case 'help':
                         console.log("Está pidiendo ayuda");
                         showHelpOptions(senderID);
