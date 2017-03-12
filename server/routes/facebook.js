@@ -448,7 +448,7 @@ function managePostBack(event){
     switch(JSON.parse(payload).payloadName){
         case "show_info":
             console.log("Mostrando info producto");
-            capture.findOne({}, {}, { sort: { 'created_at' : 1 } }, function(err, cap) {
+            capture.findOne({}, {}, { sort: { 'date' : -1 } }, function(err, cap) {
                 shoe.findOne({'code': cap.code}, function (err, data) {
                     if (err) {
                         //Error servidor
