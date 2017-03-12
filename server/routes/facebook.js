@@ -140,7 +140,7 @@ function processText(senderID, messageText, userName){
                         console.log('Está pidiendo info de un modelo');
                         let entity = res.get('trainers');
 
-                        capture.findOne({}, {}, { sort: { 'date' : -1 } }, function(err, cap) {
+                        capture.findOne({id: senderID}, {}, { sort: { 'date' : -1 } }, function(err, cap) {
                             shoe.findOne({'code': cap.code}, function (err, data) {
                                 if (err) {
                                     //Error servidor
@@ -435,7 +435,7 @@ function managePostBack(event){
     switch(JSON.parse(payload).payloadName){
         case "show_info":
             console.log("Mostrando info producto");
-            capture.findOne({}, {}, { sort: { 'date' : -1 } }, function(err, cap) {
+            capture.findOne({id: senderID}, {}, { sort: { 'date' : -1 } }, function(err, cap) {
                 shoe.findOne({'code': cap.code}, function (err, data) {
                     if (err) {
                         //Error servidor
@@ -445,7 +445,8 @@ function managePostBack(event){
                         if(cap.score < threshold){
                             sendTextMessage(senderID, "Sorry... I don't know what product is...");
                         } else {
-                            sendCardMessage(senderID, data);
+                            // TODO Nuevo mensaje
+
                         }
                     }
                 });
@@ -600,7 +601,7 @@ function isUrl(url){
 }
 
 function sendHistory(senderID){
-    capture.find({id: senderID}).sort({'submittedDate': 'desc'}).exec(function(err, data){
+    capture.find({id: senderID}).sort({'date': -1}).exec(function(err, data){
         if(err){
             sendTextMessage(senderID, "Sorry, there has been an error processing your search history");
         } else{
