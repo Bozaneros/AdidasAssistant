@@ -578,7 +578,7 @@ function sendHistory(senderID){
             var elements = [];
             data.forEach(function(capture) {
                 console.log("===================================> " + capture.code);
-                shoe.find({code: capture.code}, function(err, res){
+                shoe.findOne({'code': capture.code}, function(err, res){
                     if(err){
                         console.log("ERROR");
                     } else{
