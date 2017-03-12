@@ -162,6 +162,7 @@ function processText(senderID, messageText, userName){
                             context.findOneAndUpdate(query, update, options, function(err, data) {
                                 if (err) return;
                                 else entity = data.lastEntity;
+                                break;
                             });
                         }
                     case 'help':
