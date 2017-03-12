@@ -150,7 +150,7 @@ function processText(senderID, messageText, userName){
                                     if(cap.score < 0.01){
                                         sendTextMessage(senderID, "Sorry... I don't know what product is...");
                                     } else {
-                                        sendTextMessage(senderID, shoe.name + ". " + shoe.description + ". " + "Price: " + shoe.price +". Check it out at " + shoe.itemUrl);
+                                        sendTextMessage(senderID, data.name + ". " + data.description + ". " + "Price: " + data.price +". Check it out at " + data.itemUrl);
                                     }
                                 }
                             });
@@ -447,7 +447,7 @@ function managePostBack(event){
                             sendTextMessage(senderID, "Sorry... I don't know what product is...");
                         } else {
                             // TODO Nuevo mensaje
-                            sendTextMessage(senderID, shoe.name + ". " + shoe.description + ". " + "Price: " + shoe.price +". Check it out  " + shoe.itemUrl);
+                            sendTextMessage(senderID, data.name + ". " + data.description + ". " + "Price: " + data.price +". Check it out at " + data.itemUrl);
                         }
                     }
                 });
