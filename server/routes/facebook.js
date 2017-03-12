@@ -488,7 +488,7 @@ function showHelpOptions(recipientId){
                 payload: {
                     template_type: "generic",
                     elements: [{
-                        title: "This are the options you can do:",
+                        title: "These are the options you can do:",
                         subtitle: "",
                         buttons: [{
                             type: "postback",
