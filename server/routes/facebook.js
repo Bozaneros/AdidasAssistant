@@ -237,10 +237,11 @@ function processAttachment(senderID, messageAttachments, userName){
                 var googleMapsClient = require('@google/maps').createClient({
                     key: config.maps_api_key
                 });
-                googleMapsClient.placesNearby({
+                googleMapsClient.places({
+                    query: "adidas",
                     language: 'en',
                     location: [attachment.payload.coordinates.lat, attachment.payload.coordinates.long],
-                    rankby: 'distance',
+                    radius: 5000,
                     type: 'shop'
                 }, function(err, response) {
                     console.log(response.json.results);
