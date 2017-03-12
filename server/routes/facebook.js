@@ -149,15 +149,18 @@ function receivedMessage(event) {
 
 function processAttachment(senderID, messageAttachments, userName){
     console.log(messageAttachments);
+
     // Iterate over each entry - there may be multiple if batched
 
     messageAttachments.forEach(function(attachment) {
-
+        var imageUrl = attachment.url;
         switch (attachment.type) {
             case "image":
+                imageUrl = attachment.payload.url;
+            case "fallback":
                 var exec = require('child_process').exec;
 
-                var cmd = 'python ../main.py ' + "\"" + attachment.payload.url + "\"";
+                var cmd = 'python ../main.py ' + "\"" + imageUrl + "\"";
                 var newCapture = new capture();
                 exec(cmd, function (error, stdout, stderr) {
                     console.log("Error" + error);
@@ -231,7 +234,7 @@ function processUrl(senderID, messageAttachments, userName){
     console.log(messageAttachments);
     var exec = require('child_process').exec;
 
-    var cmd = 'python ../main.py ' + "\"" + attachment.payload.url + "\"";
+    var cmd = 'python ../main.py ' + "\"" + messageAttachments + "\"";
     var newCapture = new capture();
     exec(cmd, function (error, stdout, stderr) {
         console.log("Error" + error);
