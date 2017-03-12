@@ -410,16 +410,19 @@ function processUrl(senderID, messageAttachments, userName){
                 });
                 */
 
+
                 shoe.findOne({'code': newCapture.code}, function (err, data) {
                     if (err) {
                         //Error servidor
                         response = {"error": true, "message": "Fetching error"};
                         res.status(500).json(response);
                     } else {
-                        let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
+
+                        sendCardMessage(senderID, data);
+                      /*  let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
                         let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
                             + ". You have them for " + data.price + "$ at adidas.com";
-                        sendTextMessage(senderID, response);
+                        sendTextMessage(senderID, response);*/
                     }
                 })
             });
