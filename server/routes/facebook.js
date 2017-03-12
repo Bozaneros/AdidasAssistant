@@ -232,6 +232,23 @@ function processAttachment(senderID, messageAttachments, userName){
                     console.log(stderr);
                 });
                 break;
+            case "location":
+                console.log(attachment.payload.coordinates);
+                var googleMapsClient = require('@google/maps').createClient({
+                    key: config.maps_api_key
+                });
+                googleMapsClient.placesNearby({
+                    language: 'en',
+                    location: [attachment.payload.coordinates.lat, attachment.payload.coordinates.long],
+                    rankby: 'distance',
+                    minprice: 1,
+                    maxprice: 4,
+                    type: 'shop'
+                }, function(err, response) {
+                    console.log(response.json.results);
+                });
+                sendTextMessage(senderID, "I don't know about this...");
+                break;
             default:
                 sendTextMessage(senderID, "I don't know about this...");
                 break;
