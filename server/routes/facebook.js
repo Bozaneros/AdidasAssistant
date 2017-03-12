@@ -280,10 +280,7 @@ function processAttachment(senderID, messageAttachments, userName){
                                 if(newCapture.score < threshold){
 
                                 } else {
-                                    let randBegin = randomBegin[Math.floor(Math.random() * randomBegin.length)];
-                                    let response = randBegin + "\"" + data.name + "\"" + ". " + data.description
-                                        + ". You have them for " + data.price + "$ at adidas.com";
-                                    sendTextMessage(senderID, response);
+                                    sendCardMessage(senderID, data);
                                 }
                             }
                         })
