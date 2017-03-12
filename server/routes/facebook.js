@@ -112,7 +112,6 @@ function receivedMessage(event) {
                     .then(res => {
                         const intent = res.intent();
                         if (intent != null) {
-                            console.log("HOSTIA PUTA YA " + intent.slug)
                             switch (intent.slug) {
                                 case 'greetings':
                                     console.log("Sí es un saludo");
@@ -120,9 +119,11 @@ function receivedMessage(event) {
                                     break;
                                 case 'askformodel':
                                     console.log('Está pidiendo info de un modelo');
-                                    sendTextMessage(senderID, INTENTS[intent.slug]());
-                                    sendLoading(senderID);
                                     sendCardMessage(senderID);
+                                    break;
+                                case 'help':
+                                    console.log("Está pidiendo ayuda");
+                                    showHelpOptions(senderID);
                                     break;
                                 default:
                                     console.log("No es un saludo");
@@ -152,6 +153,8 @@ function processAttachment(senderID, messageAttachments){
 
         switch (attachment.type) {
             case "image":
+                sendTextMessage(senderID, INTENTS['askforinfo']());
+                sendLoading(senderID);
                 var exec = require('child_process').exec;
 
                 var cmd = 'python ../main.py ' + "\"" + attachment.payload.url + "\"";
@@ -238,12 +241,69 @@ function managePostBack(event){
     // button for Structured Messages.
     var payload = event.postback.payload;
 
+    switch(JSON.parse(payload).payloadName){
+        case "show_info":
+            console.log("Mostrando info producto");
+            //TODO: enviar mensaje con el cuerpo del producto
+
+            break;
+        case "recognize":
+            console.log("Quiere reconocer imagen");
+            sendTextMessage(senderID, "Insert a photo or a link photo containing Adidas trainers to recognize which model are they");
+            break;
+        case "history":
+            console.log("Quiere mostrar el historial");
+            //TODO historial
+            sendHistory(senderID);
+            break;
+        case "shops":
+            console.log("Quiere ver las tiendas");
+            sendTextMessage(senderID, "Send your location, so I can find the closest Adidas shops for you");
+            break;
+    }
+
     console.log("Received postback for user %d and page %d with payload '%s' " +
         "at %d", senderID, recipientID, payload, timeOfPostback);
 
     // When a postback is called, we'll send a message back to the sender to
     // let them know it was successful
-    sendTextMessage(senderID, JSON.parse(event.postback.payload).text);
+    sendTextMessage(senderID, JSON.parse(event.postback.payload).body.text);
+}
+
+function showHelpOptions(recipientId){
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "generic",
+                    elements: [{
+                        title: "This are the options you can do:",
+                        subtitle: "",
+                        buttons: [{
+                            type: "postback",
+                            title: "Recognize trainers",
+                            payload: '{ "payloadName": "recognize", "body": {}}'
+
+                        }, {
+                            type: "postback",
+                            title: "Show my history",
+                            payload: '{ "payloadName": "history", "body": {}}'
+                        }, {
+                            type: "postback",
+                            title: "Show closest shop",
+                            payload: '{ "payloadName": "shops", "body": {}}'
+                        }],
+                    }]
+                }
+            }
+        }
+    };
+
+    callSendAPI(messageData);
 }
 
 function sendCardMessage(recipientId/*, trainer*/){
@@ -267,7 +327,7 @@ function sendCardMessage(recipientId/*, trainer*/){
                         }, {
                             type: "postback",
                             title: "Show more info",
-                            payload: '{ "name": "Zapatilla x_plr", "text": "jajajaja xddd"}'
+                            payload: '{ "payloadName": "show_info", "body": { "name": "Zapatilla x_plr", "text": "jajajaja xddd" }}'
                         }],
                     }]
                 }
@@ -358,6 +418,10 @@ function sendLoading(senderID){
         json: {"recipient": {"id": senderID},
             "sender_action":"typing_on"}
     });
+}
+
+function sendHistory(senderID){
+
 }
 
 module.exports = router;
